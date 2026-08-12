@@ -1,0 +1,146 @@
+import React from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { CardArt } from './CardArt';
+import { 
+  X, Sparkles, Sun, Moon, Shield, Award, 
+  Flame, Droplets, Wind, Mountain, Compass, BookOpen 
+} from 'lucide-react';
+import { SUITS } from '../data/tarotDeck';
+import { audio } from '../utils/audio';
+
+export const CardDetailModal = ({ 
+  card, 
+  positionInfo, 
+  onClose 
+}) => {
+  if (!card) return null;
+
+  const suitConfig = SUITS[card.suit.toUpperCase()] || SUITS.MAJOR;
+
+  const handleClose = () => {
+    audio.playCloseModal();
+    onClose();
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      {/* Outer Click Backdrop with Fluid Fade */}
+      <motion.div 
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        className="absolute inset-0 bg-slate-950/85 backdrop-blur-md"
+        onClick={handleClose} 
+      />
+
+      {/* Modal Dialog Card with Spring Physics */}
+      <motion.div 
+        role="dialog"
+        aria-modal="true"
+        initial={{ opacity: 0, scale: 0.92, y: 20 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        exit={{ opacity: 0, scale: 0.95, y: 10 }}
+        transition={{ type: "spring", stiffness: 420, damping: 28 }}
+        className="relative z-10 w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-3xl glass-panel border border-amber-500/40 shadow-2xl p-6 md:p-8"
+      >
+        {/* Close Button */}
+        <button
+          type="button"
+          onClick={handleClose}
+          className="absolute top-4 right-4 p-2 rounded-full bg-slate-900/80 border border-slate-700 text-slate-400 hover:text-amber-300 hover:border-amber-400/50 transition-all cursor-pointer"
+        >
+          <X className="w-5 h-5" />
+        </button>
+
+        {/* Position Badge if from Spread */}
+        {positionInfo && (
+          <div className="mb-4 inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-950/80 border border-amber-500/30 text-amber-300 text-xs font-cinzel font-semibold">
+            <Sparkles className="w-3.5 h-3.5" />
+            <span>Posição da Jogada: {positionInfo.name}</span>
+          </div>
+        )}
+
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
+          
+          {/* Card Visual Column */}
+          <div className="md:col-span-5 flex justify-center">
+            <motion.div 
+              whileHover={{ scale: 1.05, rotateY: 5 }}
+              className="w-48 sm:w-56 aspect-[2/3] transform-gpu"
+            >
+              <CardArt card={card} isMini={false} showKeywords={false} />
+            </motion.div>
+          </div>
+
+          {/* Card Information Column */}
+          <div className="md:col-span-7 flex flex-col gap-3 text-left">
+            <div>
+              <span className="text-[11px] font-cinzel tracking-widest uppercase text-amber-400 font-bold">
+                {card.arcana === 'Major' ? `Arcano Maior ${card.roman}` : suitConfig.name}
+              </span>
+              <h2 className="font-cinzel text-2xl font-black text-slate-100 mt-0.5">
+                {card.name}
+              </h2>
+              <p className="text-xs font-cinzel text-amber-300/80">
+                {card.nameEn} • {card.archetype}
+              </p>
+            </div>
+
+            {/* Keywords */}
+            {card.keywords && (
+              <div className="flex flex-wrap gap-1.5 mt-1">
+                {card.keywords.map((kw, i) => (
+                  <span key={i} className="text-xs px-2 py-0.5 rounded-md bg-purple-950/70 border border-purple-500/30 text-purple-200">
+                    {kw}
+                  </span>
+                ))}
+              </div>
+            )}
+
+            {/* Position Meaning if specified */}
+            {positionInfo && (
+              <div className="mt-2 p-3 rounded-xl bg-amber-500/10 border border-amber-500/30">
+                <h4 className="text-xs font-cinzel font-bold text-amber-300 flex items-center gap-1.5 mb-1">
+                  <Compass className="w-3.5 h-3.5" />
+                  <span>Mensagem nesta Posição</span>
+                </h4>
+                <p className="text-xs text-slate-200 leading-relaxed">
+                  {positionInfo.name.includes('Passado') && (card.past || card.light)}
+                  {positionInfo.name.includes('Presente') && (card.present || card.light)}
+                  {positionInfo.name.includes('Futuro') && (card.future || card.light)}
+                  {!positionInfo.name.includes('Passado') && 
+                   !positionInfo.name.includes('Presente') && 
+                   !positionInfo.name.includes('Futuro') && (card.light)}
+                </p>
+              </div>
+            )}
+
+            {/* Light & Shadow Interpretations */}
+            <div className="space-y-2 text-xs">
+              <div className="p-2.5 rounded-lg bg-slate-900/60 border border-emerald-500/20">
+                <span className="font-semibold text-emerald-400 block mb-0.5">Luz & Potencial Positivo:</span>
+                <p className="text-slate-300 leading-relaxed">{card.light}</p>
+              </div>
+
+              <div className="p-2.5 rounded-lg bg-slate-900/60 border border-red-500/20">
+                <span className="font-semibold text-red-400 block mb-0.5">Sombra & Ponto de Atenção:</span>
+                <p className="text-slate-300 leading-relaxed">{card.shadow}</p>
+              </div>
+            </div>
+
+            {/* Advice */}
+            <div className="mt-1 p-3 rounded-xl bg-purple-950/40 border border-purple-500/30">
+              <span className="font-cinzel text-xs font-bold text-purple-300 block mb-0.5">
+                Conselho do Oráculo:
+              </span>
+              <p className="text-xs text-slate-200 italic leading-relaxed">
+                "{card.advice}"
+              </p>
+            </div>
+
+          </div>
+        </div>
+      </motion.div>
+    </div>
+  );
+};
