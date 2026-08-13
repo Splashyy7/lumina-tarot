@@ -22,6 +22,7 @@ export const SpreadSlot = ({
   }[size] || 'w-32 sm:w-40 md:w-48 lg:w-52';
 
   const isMiniArt = size === 'sm';
+  const isLarge = size === 'lg';
 
   return (
     <div className="flex flex-col items-center group/slot">
@@ -30,15 +31,40 @@ export const SpreadSlot = ({
         <motion.div 
           initial={{ opacity: 0, y: -4 }}
           animate={{ opacity: 1, y: 0 }}
-          className="mb-2 text-center max-w-[160px]"
+          className={`mb-3 text-center flex flex-col items-center ${
+            isLarge 
+              ? 'max-w-lg sm:max-w-xl' 
+              : size === 'md' 
+                ? 'max-w-[260px] sm:max-w-[300px]' 
+                : 'max-w-[140px]'
+          }`}
         >
-          <div className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-purple-950/80 border border-amber-500/30 text-amber-300 font-cinzel text-[11px] font-semibold shadow-md truncate max-w-full">
-            <span className="truncate">{positionInfo.name}</span>
+          {/* Main Position Badge */}
+          <div className={`inline-flex items-center justify-center gap-1.5 rounded-full bg-purple-950/85 border border-amber-500/40 text-amber-300 font-cinzel font-semibold shadow-md
+            ${isLarge 
+              ? 'px-4 py-1 text-xs md:text-sm font-bold tracking-wide' 
+              : size === 'md' 
+                ? 'px-3 py-0.5 text-[11px] md:text-xs' 
+                : 'px-2 py-0.5 text-[10px] truncate max-w-full'
+            }
+          `}>
+            <span>{positionInfo.name}</span>
           </div>
+
+          {/* Subtitle with expanding hover animation */}
           {positionInfo.subtitle && size !== 'sm' && (
-            <p className="text-[10px] text-slate-400 font-light mt-0.5 truncate hidden md:block">
-              {positionInfo.subtitle}
-            </p>
+            <div className="relative group/sub mt-1.5 px-3 py-0.5 cursor-default inline-flex flex-col items-center text-center">
+              <span className={`text-slate-300 font-cinzel font-normal tracking-wide transition-all duration-300 group-hover/sub:text-amber-200
+                ${isLarge ? 'text-xs sm:text-sm' : 'text-[11px]'}
+              `}>
+                {positionInfo.subtitle}
+              </span>
+              
+              {/* Dynamic Animated Line Expanding to the Right on Hover */}
+              <div className="w-full h-[1.5px] mt-1 bg-purple-900/40 relative overflow-hidden rounded-full">
+                <div className="absolute inset-0 bg-gradient-to-r from-amber-400 via-amber-300 to-purple-400 origin-left scale-x-0 group-hover/sub:scale-x-100 transition-transform duration-500 ease-out shadow-[0_0_8px_rgba(251,191,36,0.6)]" />
+              </div>
+            </div>
           )}
         </motion.div>
       )}
@@ -136,7 +162,7 @@ export const SpreadSlot = ({
               </div>
 
               <span className="font-cinzel text-[10px] sm:text-xs text-amber-200/90 font-semibold mb-0.5">
-                Slot {slotIndex + 1}
+                {isLarge ? 'Carta Focal' : `Slot ${slotIndex + 1}`}
               </span>
               <span className="text-[9px] sm:text-[10px] text-slate-400 leading-tight px-1 truncate max-w-full">
                 {isActive ? 'Escolha no baralho' : (positionInfo.name.split('.')[1] || positionInfo.name)}
