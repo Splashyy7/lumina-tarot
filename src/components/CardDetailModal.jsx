@@ -22,6 +22,28 @@ export const CardDetailModal = ({
     onClose();
   };
 
+  // Determine if this is a single card / non-positional inspection
+  const isSingleCardMode = !positionInfo || positionInfo.name === 'O Conselho do Oráculo';
+
+  // Get specific positional context message if applicable
+  const getPositionalMessage = () => {
+    if (!positionInfo || isSingleCardMode) return null;
+
+    if (positionInfo.name.includes('Passado')) return card.past || card.light;
+    if (positionInfo.name.includes('Presente')) return card.present || card.light;
+    if (positionInfo.name.includes('Futuro')) return card.future || card.light;
+    if (positionInfo.name.includes('Desafio')) return card.shadow;
+    if (positionInfo.name.includes('Ação')) return card.advice;
+    if (positionInfo.name.includes('Desfecho')) return card.future || card.light;
+    if (positionInfo.name.includes('Mental')) return card.light;
+    if (positionInfo.name.includes('Espiritual')) return card.light;
+    if (positionInfo.name.includes('Físico')) return card.light;
+
+    return null;
+  };
+
+  const positionalMessage = getPositionalMessage();
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       {/* Outer Click Backdrop with Fluid Fade */}
@@ -52,8 +74,8 @@ export const CardDetailModal = ({
           <X className="w-5 h-5" />
         </button>
 
-        {/* Position Badge if from Spread */}
-        {positionInfo && (
+        {/* Position Badge if from a multi-card Spread */}
+        {positionInfo && !isSingleCardMode && (
           <div className="mb-4 inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-950/80 border border-amber-500/30 text-amber-300 text-xs font-cinzel font-semibold">
             <Sparkles className="w-3.5 h-3.5" />
             <span>Posição da Jogada: {positionInfo.name}</span>
@@ -97,20 +119,15 @@ export const CardDetailModal = ({
               </div>
             )}
 
-            {/* Position Meaning if specified */}
-            {positionInfo && (
+            {/* Position Meaning ONLY when meaningful in multi-card spreads */}
+            {positionalMessage && (
               <div className="mt-2 p-3 rounded-xl bg-amber-500/10 border border-amber-500/30">
                 <h4 className="text-xs font-cinzel font-bold text-amber-300 flex items-center gap-1.5 mb-1">
                   <Compass className="w-3.5 h-3.5" />
-                  <span>Mensagem nesta Posição</span>
+                  <span>Influência na Posição ({positionInfo.name})</span>
                 </h4>
                 <p className="text-xs text-slate-200 leading-relaxed">
-                  {positionInfo.name.includes('Passado') && (card.past || card.light)}
-                  {positionInfo.name.includes('Presente') && (card.present || card.light)}
-                  {positionInfo.name.includes('Futuro') && (card.future || card.light)}
-                  {!positionInfo.name.includes('Passado') && 
-                   !positionInfo.name.includes('Presente') && 
-                   !positionInfo.name.includes('Futuro') && (card.light)}
+                  {positionalMessage}
                 </p>
               </div>
             )}

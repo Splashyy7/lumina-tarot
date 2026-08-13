@@ -31,11 +31,11 @@ export const SpreadSlot = ({
         <motion.div 
           initial={{ opacity: 0, y: -4 }}
           animate={{ opacity: 1, y: 0 }}
-          className={`mb-3 text-center flex flex-col items-center ${
+          className={`mb-2 text-center flex flex-col items-center ${
             isLarge 
               ? 'max-w-lg sm:max-w-xl' 
               : size === 'md' 
-                ? 'max-w-[260px] sm:max-w-[300px]' 
+                ? 'max-w-[240px] sm:max-w-[280px]' 
                 : 'max-w-[140px]'
           }`}
         >
@@ -51,20 +51,16 @@ export const SpreadSlot = ({
             <span>{positionInfo.name}</span>
           </div>
 
-          {/* Subtitle with expanding hover animation */}
+          {/* Discreet, Camouflaged Subtitle without underline */}
           {positionInfo.subtitle && size !== 'sm' && (
-            <div className="relative group/sub mt-1.5 px-3 py-0.5 cursor-default inline-flex flex-col items-center text-center">
-              <span className={`text-slate-300 font-cinzel font-normal tracking-wide transition-all duration-300 group-hover/sub:text-amber-200
-                ${isLarge ? 'text-xs sm:text-sm' : 'text-[11px]'}
-              `}>
-                {positionInfo.subtitle}
-              </span>
-              
-              {/* Dynamic Animated Line Expanding to the Right on Hover */}
-              <div className="w-full h-[1.5px] mt-1 bg-purple-900/40 relative overflow-hidden rounded-full">
-                <div className="absolute inset-0 bg-gradient-to-r from-amber-400 via-amber-300 to-purple-400 origin-left scale-x-0 group-hover/sub:scale-x-100 transition-transform duration-500 ease-out shadow-[0_0_8px_rgba(251,191,36,0.6)]" />
-              </div>
-            </div>
+            <p className={`font-light transition-colors duration-200 mt-1 px-2 text-center select-none cursor-default
+              ${isLarge 
+                ? 'text-[11px] md:text-xs text-slate-400/90 hover:text-slate-200' 
+                : 'text-[10px] text-slate-500 hover:text-slate-300'
+              }
+            `}>
+              {positionInfo.subtitle}
+            </p>
           )}
         </motion.div>
       )}
@@ -112,7 +108,7 @@ export const SpreadSlot = ({
                 </span>
               </div>
 
-              {/* Remove Card Button */}
+              {/* Remove Card Button - Enlarged & Hover-Expanded */}
               {onRemoveCard && (
                 <button
                   type="button"
@@ -122,9 +118,9 @@ export const SpreadSlot = ({
                     onRemoveCard(slotIndex);
                   }}
                   title="Remover carta da posição"
-                  className="absolute -top-2 -right-2 w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-slate-900 border border-red-500/50 text-red-400 hover:bg-red-950 hover:text-red-200 flex items-center justify-center shadow-md transition-colors z-30 cursor-pointer"
+                  className="absolute -top-2.5 -right-2.5 w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-slate-950 border-2 border-red-500/80 text-red-300 hover:text-white hover:bg-red-900 hover:border-red-400 hover:scale-125 hover:shadow-[0_0_16px_rgba(239,68,68,0.85)] flex items-center justify-center shadow-xl transition-all duration-200 ease-out z-30 cursor-pointer active:scale-95"
                 >
-                  <X className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
+                  <X className="w-3.5 h-3.5 sm:w-4 sm:h-4 stroke-[2.5]" />
                 </button>
               )}
             </motion.div>

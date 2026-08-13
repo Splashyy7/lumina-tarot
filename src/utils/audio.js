@@ -30,7 +30,6 @@ class MysticAudioEngine {
       if (this.ctx && this.ctx.state === 'suspended') {
         this.ctx.resume().then(() => {
           if (this.loadingNodes && this.loadingNodes.gainNode) {
-            // Ensure loading gain is active if on loading screen
             const now = this.ctx.currentTime;
             this.loadingNodes.gainNode.gain.setValueAtTime(0.04, now);
           }
@@ -54,7 +53,7 @@ class MysticAudioEngine {
     return this.muted;
   }
 
-  // Ambient Soft Loading Tone Engine (Audible, Lush & Soothing)
+  // Ambient Soft Loading Tone Engine
   startLoadingAmbience() {
     if (this.muted) return;
     this.init();
@@ -64,7 +63,6 @@ class MysticAudioEngine {
       this.stopLoadingAmbience();
       const now = this.ctx.currentTime;
 
-      // 1. Dual Harmonic Sine Drone (396Hz Solfeggio & 594Hz Fifth)
       const osc1 = this.ctx.createOscillator();
       const osc2 = this.ctx.createOscillator();
       const osc3 = this.ctx.createOscillator();
@@ -82,7 +80,7 @@ class MysticAudioEngine {
       filter.frequency.setValueAtTime(1100, now);
 
       gainNode.gain.setValueAtTime(0.001, now);
-      gainNode.gain.linearRampToValueAtTime(0.042, now + 0.35); // Audible, pleasant and warm volume
+      gainNode.gain.linearRampToValueAtTime(0.042, now + 0.35);
 
       osc1.connect(filter);
       osc2.connect(filter);
@@ -100,7 +98,6 @@ class MysticAudioEngine {
     }
   }
 
-  // Modulate loading tone subtly as progress advances (0% to 100%)
   updateLoadingProgress(progress) {
     if (this.muted || !this.ctx) return;
     try {
@@ -118,7 +115,6 @@ class MysticAudioEngine {
         this.loadingNodes.filter.frequency.setTargetAtTime(1100 + (normalized * 400), now, 0.1);
       }
 
-      // Audible crystal chime pulses at key percentage milestones (15%, 35%, 55%, 75%, 95%)
       if ([15, 35, 55, 75, 95].includes(progress)) {
         const chimeNotes = { 15: 528, 35: 660, 55: 792, 75: 990, 95: 1188 };
         const freq = chimeNotes[progress] || 880;
@@ -396,7 +392,7 @@ class MysticAudioEngine {
     }
   }
 
-  // Dedicated Sound for Removing a Card (Button 'X' on Slots)
+  // Dedicated Sound for Removing a Single Card (Button 'X' on Slots)
   playRemoveCard() {
     if (this.muted) return;
     this.init();
@@ -428,6 +424,67 @@ class MysticAudioEngine {
       gain2.connect(this.ctx.destination);
       osc2.start(now + 0.02);
       osc2.stop(now + 0.16);
+    } catch (e) {
+      // Fallback
+    }
+  }
+
+  // Dedicated Sound for Clearing the Entire Altar Table ("Limpar Mesa")
+  playClearTable() {
+    if (this.muted) return;
+    this.init();
+    if (!this.ctx) return;
+
+    try {
+      const now = this.ctx.currentTime;
+
+      // 1. Altar Sweep Velvet Whoosh (Filtered soft noise)
+      const bufferSize = this.ctx.sampleRate * 0.4;
+      const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
+      const data = buffer.getChannelData(0);
+      for (let i = 0; i < bufferSize; i++) {
+        data[i] = (Math.random() * 2 - 1) * 0.3;
+      }
+      const noise = this.ctx.createBufferSource();
+      noise.buffer = buffer;
+
+      const filter = this.ctx.createBiquadFilter();
+      filter.type = 'bandpass';
+      filter.frequency.setValueAtTime(1200, now);
+      filter.frequency.exponentialRampToValueAtTime(400, now + 0.35);
+      filter.Q.setValueAtTime(1.5, now);
+
+      const noiseGain = this.ctx.createGain();
+      noiseGain.gain.setValueAtTime(0.001, now);
+      noiseGain.gain.linearRampToValueAtTime(0.045, now + 0.08);
+      noiseGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.38);
+
+      noise.connect(filter);
+      filter.connect(noiseGain);
+      noiseGain.connect(this.ctx.destination);
+      noise.start(now);
+      noise.stop(now + 0.4);
+
+      // 2. Cascade of 3 returning card whisks (Descending triad: A5, E5, C5)
+      const notes = [880, 659.25, 523.25];
+      notes.forEach((freq, idx) => {
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        const t = now + 0.05 + idx * 0.07;
+        
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(freq, t);
+        osc.frequency.exponentialRampToValueAtTime(freq * 0.6, t + 0.18);
+        
+        gain.gain.setValueAtTime(0.03, t);
+        gain.gain.exponentialRampToValueAtTime(0.0001, t + 0.2);
+
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+
+        osc.start(t);
+        osc.stop(t + 0.2);
+      });
     } catch (e) {
       // Fallback
     }

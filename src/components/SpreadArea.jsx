@@ -108,7 +108,7 @@ export const SpreadArea = ({
                     Cruzada
                   </div>
 
-                  {/* Remove Card Button */}
+                  {/* Remove Card Button - Enlarged & Hover-Expanded */}
                   {onRemoveCard && (
                     <button
                       type="button"
@@ -118,9 +118,9 @@ export const SpreadArea = ({
                         onRemoveCard(1);
                       }}
                       title="Remover carta cruzada"
-                      className="absolute -top-2 -right-2 w-5 h-5 rounded-full bg-slate-900 border border-red-500 text-red-400 hover:bg-red-950 hover:text-red-200 flex items-center justify-center shadow-md transition-colors z-30 cursor-pointer"
+                      className="absolute -top-2.5 -right-2.5 w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-slate-950 border-2 border-red-500/80 text-red-300 hover:text-white hover:bg-red-900 hover:border-red-400 hover:scale-125 hover:shadow-[0_0_16px_rgba(239,68,68,0.85)] flex items-center justify-center shadow-xl transition-all duration-200 ease-out z-30 cursor-pointer active:scale-95"
                     >
-                      <X className="w-3 h-3" />
+                      <X className="w-3.5 h-3.5 sm:w-4 sm:h-4 stroke-[2.5]" />
                     </button>
                   )}
                 </div>
@@ -328,8 +328,11 @@ export const SpreadArea = ({
             {filledSlotsCount > 0 && (
               <button
                 type="button"
-                onClick={onResetSpread}
-                className="px-3 py-1.5 rounded-full bg-slate-900/80 hover:bg-slate-800 text-slate-300 hover:text-amber-300 border border-slate-700 hover:border-amber-400/50 text-xs flex items-center gap-1.5 transition-all cursor-pointer active:scale-95"
+                onClick={() => {
+                  audio.playClearTable();
+                  onResetSpread();
+                }}
+                className="px-3 py-1.5 rounded-full bg-slate-900/80 hover:bg-slate-800 text-slate-300 hover:text-amber-300 border border-slate-700 hover:border-amber-400/50 text-xs flex items-center gap-1.5 transition-all cursor-pointer active:scale-95 shadow-sm"
                 title="Limpar mesa"
               >
                 <RotateCcw className="w-3.5 h-3.5" />
