@@ -23,8 +23,9 @@ export const SpreadSelector = ({
   };
 
   return (
-    <nav aria-label="Seletor de Tipo de Tiragem" className="w-full max-w-5xl mx-auto mb-8 px-2 sm:px-4">
-      <div className="flex items-center justify-center gap-1.5 sm:gap-2.5 md:gap-3 flex-wrap sm:flex-nowrap">
+    <nav aria-label="Seletor de Tipo de Tiragem" className="w-full max-w-5xl mx-auto mb-8 px-2 sm:px-4 overflow-visible">
+      {/* Mobile: Horizontal scroll without scrollbar | Desktop: Centered flex row, overflow-visible */}
+      <div className="flex items-center justify-start sm:justify-center gap-1.5 sm:gap-2.5 md:gap-3 overflow-x-auto sm:overflow-visible no-scrollbar py-2 px-1 sm:px-0">
         {SPREAD_TYPES.map((spread) => {
           const Icon = ICONS_MAP[spread.icon] || Sparkles;
           const isSelected = spread.id === currentSpread.id;
@@ -34,7 +35,7 @@ export const SpreadSelector = ({
               key={spread.id}
               onClick={() => handleSelect(spread)}
               type="button"
-              className={`group relative px-2.5 sm:px-3.5 md:px-4 py-2 rounded-xl text-xs md:text-sm font-cinzel font-semibold flex items-center gap-1.5 sm:gap-2 shrink-0 transition-colors duration-200 cursor-pointer
+              className={`group relative px-3 sm:px-3.5 md:px-4 py-2 rounded-xl text-xs md:text-sm font-cinzel font-semibold flex items-center gap-1.5 sm:gap-2 shrink-0 transition-colors duration-200 cursor-pointer
                 ${isSelected
                   ? 'text-amber-300'
                   : 'text-slate-400 hover:text-slate-200 bg-slate-950/70 border border-purple-900/40 hover:border-purple-500/50 hover:bg-slate-900/90 shadow-sm'

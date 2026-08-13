@@ -31,19 +31,19 @@ export const GuideModal = ({ isOpen, onClose }) => {
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.95, y: 10 }}
         transition={{ type: "spring", stiffness: 420, damping: 28 }}
-        className="relative z-10 w-full max-w-2xl max-h-[85vh] overflow-y-auto rounded-3xl glass-panel border border-amber-500/40 shadow-2xl p-6 md:p-8"
+        className="relative z-10 w-full max-w-2xl max-h-[88vh] overflow-y-auto rounded-3xl glass-panel border border-amber-500/40 shadow-2xl p-4 sm:p-6 md:p-8"
       >
         <button
           type="button"
           onClick={handleClose}
-          className="absolute top-5 right-5 p-2 rounded-full bg-slate-900/80 border border-slate-700 text-slate-400 hover:text-amber-300 hover:border-amber-400/50 transition-all cursor-pointer"
+          className="absolute top-4 right-4 p-2 rounded-full bg-slate-900/80 border border-slate-700 text-slate-400 hover:text-amber-300 hover:border-amber-400/50 transition-all cursor-pointer z-20"
         >
           <X className="w-5 h-5" />
         </button>
 
         <div className="flex items-center gap-2 mb-2 text-amber-400">
           <HelpCircle className="w-5 h-5" />
-          <h3 className="font-cinzel text-xl font-bold text-amber-200">
+          <h3 className="font-cinzel text-lg sm:text-xl font-bold text-amber-200">
             Guia do Oráculo Lumina
           </h3>
         </div>
@@ -109,7 +109,7 @@ export const GuideModal = ({ isOpen, onClose }) => {
           <button
             type="button"
             onClick={onClose}
-            className="px-5 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-cinzel font-bold text-xs cursor-pointer transition-colors active:scale-95"
+            className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-cinzel font-bold text-xs cursor-pointer transition-colors active:scale-95 text-center"
           >
             Compreendi, Voltar à Mesa
           </button>

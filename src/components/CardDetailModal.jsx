@@ -45,7 +45,7 @@ export const CardDetailModal = ({
   const positionalMessage = getPositionalMessage();
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4">
       {/* Outer Click Backdrop with Fluid Fade */}
       <motion.div 
         initial={{ opacity: 0 }}
@@ -63,13 +63,13 @@ export const CardDetailModal = ({
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.95, y: 10 }}
         transition={{ type: "spring", stiffness: 420, damping: 28 }}
-        className="relative z-10 w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-3xl glass-panel border border-amber-500/40 shadow-2xl p-6 md:p-8"
+        className="relative z-10 w-full max-w-2xl max-h-[92vh] overflow-y-auto rounded-3xl glass-panel border border-amber-500/40 shadow-2xl p-4 sm:p-6 md:p-8"
       >
         {/* Close Button */}
         <button
           type="button"
           onClick={handleClose}
-          className="absolute top-4 right-4 p-2 rounded-full bg-slate-900/80 border border-slate-700 text-slate-400 hover:text-amber-300 hover:border-amber-400/50 transition-all cursor-pointer"
+          className="absolute top-4 right-4 p-2 rounded-full bg-slate-900/80 border border-slate-700 text-slate-400 hover:text-amber-300 hover:border-amber-400/50 transition-all cursor-pointer z-20"
         >
           <X className="w-5 h-5" />
         </button>
@@ -78,17 +78,17 @@ export const CardDetailModal = ({
         {positionInfo && !isSingleCardMode && (
           <div className="mb-4 inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-950/80 border border-amber-500/30 text-amber-300 text-xs font-cinzel font-semibold">
             <Sparkles className="w-3.5 h-3.5" />
-            <span>Posição da Jogada: {positionInfo.name}</span>
+            <span>Posição: {positionInfo.name}</span>
           </div>
         )}
 
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-5 md:gap-6 items-center">
           
           {/* Card Visual Column */}
           <div className="md:col-span-5 flex justify-center">
             <motion.div 
               whileHover={{ scale: 1.05, rotateY: 5 }}
-              className="w-48 sm:w-56 aspect-[2/3] transform-gpu"
+              className="w-40 sm:w-48 md:w-56 aspect-[2/3] transform-gpu"
             >
               <CardArt card={card} isMini={false} showKeywords={false} />
             </motion.div>

@@ -21,7 +21,7 @@ export const DeckSelectionGrid = ({
 
   const filterTabs = [
     { id: 'all', label: 'Todas', count: 78, icon: Layers },
-    { id: 'major', label: 'Arcanos Maiores', count: 22, icon: Sparkles, color: 'text-amber-400' },
+    { id: 'major', label: 'Maiores', count: 22, icon: Sparkles, color: 'text-amber-400' },
     { id: 'wands', label: 'Paus', count: 14, icon: Flame, color: 'text-orange-400' },
     { id: 'cups', label: 'Copas', count: 14, icon: Droplets, color: 'text-cyan-400' },
     { id: 'swords', label: 'Espadas', count: 14, icon: Wind, color: 'text-slate-300' },
@@ -71,35 +71,35 @@ export const DeckSelectionGrid = ({
   };
 
   return (
-    <section aria-label="Seleção do Baralho de Tarot" className="w-full max-w-7xl mx-auto">
+    <section aria-label="Seleção do Baralho de Tarot" className="w-full max-w-7xl mx-auto px-2 sm:px-4">
       {/* Grid Controls & Header */}
-      <div className="relative z-10 glass-panel rounded-2xl p-4 md:p-6 mb-6 border border-amber-500/20 shadow-xl">
+      <div className="relative z-10 glass-panel rounded-2xl p-4 sm:p-5 md:p-6 mb-6 border border-amber-500/20 shadow-xl">
         <div className="flex flex-col lg:flex-row items-center justify-between gap-4">
           
           {/* Title & Guidance */}
-          <div>
-            <div className="flex items-center gap-2">
-              <h3 className="font-cinzel text-lg md:text-xl font-bold text-amber-200">
+          <div className="text-center lg:text-left">
+            <div className="flex items-center justify-center lg:justify-start gap-2">
+              <h3 className="font-cinzel text-base sm:text-lg md:text-xl font-bold text-amber-200">
                 O Baralho Arcano ({availableCount} de 78 cartas)
               </h3>
             </div>
-            <p className="text-xs md:text-sm text-slate-400 mt-0.5">
+            <p className="text-xs sm:text-sm text-slate-400 mt-0.5">
               {isShuffling 
                 ? 'Embaralhando as energias e os 78 arcanos...'
                 : canSelectMore 
-                  ? `Passe o mouse para sentir a vibração e clique para escolher mais ${remainingToPick} carta(s).`
-                  : 'Todos os slots da jogada foram preenchidos! Veja a interpretação acima.'
+                  ? `Passe o mouse ou toque para escolher mais ${remainingToPick} carta(s).`
+                  : 'Todos os slots foram preenchidos! Veja a interpretação acima.'
               }
             </p>
           </div>
 
           {/* Quick Actions (Embaralhar & Destino) */}
-          <div className="flex flex-wrap items-center gap-2.5">
+          <div className="flex flex-wrap items-center justify-center gap-2.5 w-full sm:w-auto">
             <button
               type="button"
               onClick={handleShuffle}
               disabled={isShuffling}
-              className={`px-4 py-2 rounded-xl border text-xs font-semibold flex items-center gap-2 transition-all shadow-md active:scale-95 cursor-pointer
+              className={`px-4 py-2 rounded-xl border text-xs font-semibold flex items-center justify-center gap-2 transition-all shadow-md active:scale-95 cursor-pointer
                 ${isShuffling 
                   ? 'bg-amber-500/20 border-amber-400 text-amber-300 shadow-[0_0_15px_rgba(251,191,36,0.3)] animate-pulse'
                   : 'bg-purple-950/80 hover:bg-purple-900 border-purple-500/40 hover:border-amber-400/60 text-purple-200 hover:text-amber-200'
@@ -114,9 +114,9 @@ export const DeckSelectionGrid = ({
               <button
                 type="button"
                 onClick={handleRandomPick}
-                className="px-4 py-2 rounded-xl bg-gradient-to-r from-amber-600/80 to-amber-500/80 hover:from-amber-500 hover:to-amber-400 text-slate-950 text-xs font-cinzel font-bold flex items-center gap-2 transition-all shadow-md active:scale-95 border border-amber-300/40 cursor-pointer"
+                className="px-4 py-2 rounded-xl bg-gradient-to-r from-amber-600/80 to-amber-500/80 hover:from-amber-500 hover:to-amber-400 text-slate-950 text-xs font-cinzel font-bold flex items-center justify-center gap-2 transition-all shadow-md active:scale-95 border border-amber-300/40 cursor-pointer"
               >
-                <Dices className="w-4 h-4 text-slate-950" />
+                <Dices className="w-4 h-4 text-slate-950 shrink-0" />
                 <span>Escolha Guiada pelo Destino</span>
               </button>
             )}
@@ -127,8 +127,8 @@ export const DeckSelectionGrid = ({
         {!isShuffling && (
           <div className="mt-4 pt-4 border-t border-purple-900/40 flex flex-col md:flex-row items-center justify-between gap-3 animate-fade-in">
             
-            {/* Suit / Arcana Filter Tabs */}
-            <div className="flex flex-wrap items-center gap-1.5 w-full md:w-auto">
+            {/* Suit / Arcana Filter Tabs (Scrollable on Mobile, Flex on Desktop) */}
+            <div className="flex items-center gap-1.5 w-full md:w-auto overflow-x-auto md:overflow-visible no-scrollbar pb-1 md:pb-0 touch-pan-x flex-nowrap md:flex-wrap">
               {filterTabs.map((tab) => {
                 const Icon = tab.icon;
                 const isActive = activeFilter === tab.id;
@@ -136,7 +136,7 @@ export const DeckSelectionGrid = ({
                   <button
                     key={tab.id}
                     onClick={() => setActiveFilter(tab.id)}
-                    className={`px-3 py-1.5 rounded-lg text-xs font-medium flex items-center gap-1.5 transition-all cursor-pointer
+                    className={`px-3 py-1.5 rounded-lg text-xs font-medium flex items-center gap-1.5 shrink-0 transition-all cursor-pointer
                       ${isActive
                         ? 'bg-amber-400/20 text-amber-300 border border-amber-400/60 shadow-[0_0_12px_rgba(251,191,36,0.2)]'
                         : 'bg-slate-900/60 text-slate-400 hover:text-slate-200 border border-slate-800 hover:border-purple-500/30'
@@ -169,7 +169,7 @@ export const DeckSelectionGrid = ({
       <div className="relative min-h-[420px]">
         {isShuffling ? (
           /* 3D Cinematic Shuffle Experience */
-          <div className="w-full rounded-2xl glass-panel-subtle border border-amber-500/30 p-6 shadow-2xl animate-fade-in flex items-center justify-center">
+          <div className="w-full rounded-2xl glass-panel-subtle border border-amber-500/30 p-4 sm:p-6 shadow-2xl animate-fade-in flex items-center justify-center">
             <DeckShuffleAnimation onComplete={handleShuffleFinished} />
           </div>
         ) : filteredCards.length === 0 ? (
@@ -177,8 +177,8 @@ export const DeckSelectionGrid = ({
             Nenhuma carta encontrada para os filtros selecionados.
           </div>
         ) : (
-          /* The 78-Card Deck Grid Layout */
-          <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-10 xl:grid-cols-13 gap-2 sm:gap-2.5 md:gap-3 animate-fade-in">
+          /* The 78-Card Deck Grid Layout: Compact 13 columns on large desktop, 3 columns on small mobile */
+          <div className="grid grid-cols-3 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-10 xl:grid-cols-13 gap-2 sm:gap-2.5 md:gap-3 animate-fade-in">
             {filteredCards.map((card, idx) => (
               <CardBack
                 key={card.id}

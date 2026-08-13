@@ -301,25 +301,25 @@ export const InterpretationModal = ({
           </div>
         </div>
 
-        {/* Bottom Actions Bar */}
-        <div className="pt-6 border-t border-amber-500/20 flex flex-wrap items-center justify-between gap-4">
+        {/* Bottom Actions Bar - Full Mobile Width */}
+        <div className="pt-6 border-t border-amber-500/20 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
           <button
             type="button"
             onClick={handleCopyReading}
-            className="px-5 py-2.5 rounded-xl bg-purple-950/80 hover:bg-purple-900 border border-purple-500/40 text-purple-200 hover:text-amber-200 text-xs font-semibold flex items-center gap-2 transition-all cursor-pointer shadow-md active:scale-95"
+            className="w-full sm:w-auto px-5 py-3 sm:py-2.5 rounded-xl bg-purple-950/80 hover:bg-purple-900 border border-purple-500/40 text-purple-200 hover:text-amber-200 text-xs font-semibold flex items-center justify-center gap-2 transition-all cursor-pointer shadow-md active:scale-95"
           >
             {copied ? <Check className="w-4 h-4 text-emerald-400" /> : <Copy className="w-4 h-4" />}
             <span>{copied ? 'Leitura Copiada com Sucesso!' : 'Copiar Leitura Completa'}</span>
           </button>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 sm:gap-3 w-full sm:w-auto">
             <button
               type="button"
               onClick={() => {
                 onClose();
                 if (onResetReading) onResetReading();
               }}
-              className="px-5 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-700 text-slate-300 hover:text-amber-300 text-xs font-semibold flex items-center gap-2 transition-all cursor-pointer active:scale-95"
+              className="flex-1 sm:flex-initial px-4 py-3 sm:py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-700 text-slate-300 hover:text-amber-300 text-xs font-semibold flex items-center justify-center gap-2 transition-all cursor-pointer active:scale-95"
             >
               <RotateCcw className="w-4 h-4" />
               <span>Nova Tiragem</span>
@@ -328,9 +328,9 @@ export const InterpretationModal = ({
             <button
               type="button"
               onClick={handleClose}
-              className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-500 hover:to-amber-400 text-slate-950 font-cinzel font-bold text-xs tracking-wider transition-all cursor-pointer shadow-lg active:scale-95"
+              className="flex-1 sm:flex-initial px-5 py-3 sm:py-2.5 rounded-xl bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-500 hover:to-amber-400 text-slate-950 font-cinzel font-bold text-xs tracking-wider transition-all cursor-pointer shadow-lg active:scale-95 text-center"
             >
-              Concluir Leitura
+              Concluir
             </button>
           </div>
         </div>
