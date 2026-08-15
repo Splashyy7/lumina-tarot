@@ -201,7 +201,7 @@ export const InterpretationModal = ({
             <div className="flex items-center gap-2 pb-3 mb-3 border-b border-purple-500/20 text-amber-400">
               <Sparkles className="w-5 h-5 text-amber-400 animate-pulse" />
               <h3 className="font-cinzel text-base sm:text-lg font-bold text-amber-200 gold-gradient-text">
-                Síntese Sagrada & Revelação do Oráculo
+                Interpretação da sua Leitura
               </h3>
             </div>
 
@@ -210,33 +210,33 @@ export const InterpretationModal = ({
               <div className="py-8 flex flex-col items-center justify-center gap-3 text-center">
                 <Sparkles className="w-8 h-8 text-amber-400 animate-spin" style={{ animationDuration: '4s' }} />
                 <p className="font-cinzel text-xs sm:text-sm text-purple-200 animate-pulse">
-                  Conectando aos arcanos e decifrando a resposta à sua intenção...
+                  Analisando as cartas e preparando uma resposta clara para você...
                 </p>
               </div>
             ) : aiReading?.diagnosis ? (
               <div className="space-y-3.5 animate-fade-in text-xs sm:text-sm leading-relaxed text-slate-200 font-sans">
-                {/* 1. Diagnóstico da Pergunta */}
+                {/* 1. O que as cartas mostram */}
                 <div className="p-3.5 sm:p-4 rounded-2xl bg-slate-900/80 border border-purple-500/30">
                   <span className="font-cinzel text-xs font-bold text-amber-300 flex items-center gap-1.5 mb-1.5 uppercase tracking-wider">
-                    <span>🌌 O Diagnóstico da Intenção</span>
+                    <span>🔍 O que as cartas estão mostrando</span>
                   </span>
                   <p className="text-slate-300">{aiReading.diagnosis}</p>
                 </div>
 
-                {/* 2. Dinâmica das Forças */}
+                {/* 2. O que está acontecendo */}
                 <div className="p-3.5 sm:p-4 rounded-2xl bg-slate-900/80 border border-purple-500/30">
                   <span className="font-cinzel text-xs font-bold text-amber-300 flex items-center gap-1.5 mb-1.5 uppercase tracking-wider">
-                    <span>🔮 A Dinâmica das Forças Ocultas</span>
+                    <span>💡 O que está acontecendo por trás</span>
                   </span>
                   <p className="text-slate-300">{aiReading.dynamics}</p>
                 </div>
 
-                {/* 3. Conselho Sagrado */}
+                {/* 3. Conselho Prático */}
                 <div className="p-3.5 sm:p-4 rounded-2xl bg-purple-950/70 border border-amber-400/40">
                   <span className="font-cinzel text-xs font-bold text-amber-300 flex items-center gap-1.5 mb-1.5 uppercase tracking-wider">
-                    <span>🗝️ O Conselho Sagrado do Oráculo</span>
+                    <span>🧭 Conselho prático para você</span>
                   </span>
-                  <p className="text-amber-100/95 italic">{aiReading.advice}</p>
+                  <p className="text-amber-100/95 font-medium">{aiReading.advice}</p>
                 </div>
               </div>
             ) : (
