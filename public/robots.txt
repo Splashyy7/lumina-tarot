@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://splashyy7.github.io/lumina-tarot/sitemap.xml

@@ -26,12 +26,17 @@ export const Header = ({
 }) => {
   const [isMuted, setIsMuted] = useState(audio.isMuted());
   const [isMusicPlaying, setIsMusicPlaying] = useState(() => bgMusicService.getIsPlaying());
+  const [volume, setVolume] = useState(() => bgMusicService.getVolume());
+  const [showVolumeSlider, setShowVolumeSlider] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
 
   useEffect(() => {
     const handleMusicChange = (e) => {
       if (e.detail) {
         setIsMusicPlaying(e.detail.isPlaying);
+        if (typeof e.detail.volume === 'number') {
+          setVolume(e.detail.volume);
+        }
       }
     };
     window.addEventListener('lumina_bg_music_changed', handleMusicChange);
@@ -51,6 +56,12 @@ export const Header = ({
     audio.playSelect();
     const active = bgMusicService.toggle();
     setIsMusicPlaying(active);
+  };
+
+  const handleVolumeChange = (e) => {
+    const newVol = parseFloat(e.target.value);
+    setVolume(newVol);
+    bgMusicService.setVolume(newVol);
   };
 
   const toggleReversed = () => {
@@ -148,21 +159,64 @@ export const Header = ({
             <span className="hidden md:inline">Temas</span>
           </button>
 
-          {/* Sanctuary Genuine Background Music Button (Off by default, gentle 15% volume) */}
-          <button
-            type="button"
-            onClick={toggleMusic}
-            title={isMusicPlaying ? 'Pausar Música de Fundo do Santuário' : 'Ativar Música de Fundo do Santuário (Desligada por padrão)'}
-            className={`px-2.5 py-1.5 rounded-xl border text-xs font-cinzel font-semibold flex items-center gap-1.5 transition-all cursor-pointer shadow-sm active:scale-95
-              ${isMusicPlaying 
-                ? 'bg-amber-400/20 border-amber-400/70 text-amber-300 shadow-[0_0_12px_rgba(251,191,36,0.3)]' 
-                : 'glass-panel-subtle border-slate-700/60 text-slate-400 hover:text-slate-200'
-              }
-            `}
+          {/* Sanctuary Background Music Button + Volume Slider */}
+          <div 
+            className="relative"
+            onMouseEnter={() => {
+              if (window._volTimer) clearTimeout(window._volTimer);
+              setShowVolumeSlider(true);
+            }}
+            onMouseLeave={() => {
+              window._volTimer = setTimeout(() => setShowVolumeSlider(false), 350);
+            }}
           >
-            <Music className={`w-3.5 h-3.5 ${isMusicPlaying ? 'text-amber-400 animate-pulse' : 'text-slate-400'}`} />
-            <span className="hidden lg:inline">{isMusicPlaying ? 'Música Ligada' : 'Música'}</span>
-          </button>
+            <button
+              type="button"
+              onClick={toggleMusic}
+              title={isMusicPlaying ? `Música de Fundo: Ligada (${Math.round(volume * 100)}%) - Passe o mouse para ajustar` : 'Ativar Música de Fundo do Santuário'}
+              className={`px-2.5 py-1.5 rounded-xl border text-xs font-cinzel font-semibold flex items-center gap-1.5 transition-all cursor-pointer shadow-sm active:scale-95
+                ${isMusicPlaying 
+                  ? 'bg-amber-400/20 border-amber-400/70 text-amber-300 shadow-[0_0_12px_rgba(251,191,36,0.3)]' 
+                  : 'glass-panel-subtle border-slate-700/60 text-slate-400 hover:text-slate-200'
+                }
+              `}
+            >
+              <Music className={`w-3.5 h-3.5 ${isMusicPlaying ? 'text-amber-400 animate-pulse' : 'text-slate-400'}`} />
+              <span className="hidden lg:inline">{isMusicPlaying ? `${Math.round(volume * 100)}%` : 'Música'}</span>
+            </button>
+
+            {/* Floating Volume Slider on Hover / Focus with Invisible Bridge */}
+            {showVolumeSlider && (
+              <div 
+                onMouseEnter={() => {
+                  if (window._volTimer) clearTimeout(window._volTimer);
+                }}
+                onMouseLeave={() => {
+                  window._volTimer = setTimeout(() => setShowVolumeSlider(false), 350);
+                }}
+                className="absolute top-full pt-2 left-1/2 -translate-x-1/2 z-50 min-w-[150px]"
+              >
+                <div className="p-2.5 rounded-2xl bg-slate-900/95 backdrop-blur-2xl border border-amber-500/40 shadow-2xl shadow-purple-950/80 flex flex-col gap-1.5">
+                  <div className="flex items-center justify-between text-[11px] font-cinzel text-amber-300 font-semibold px-0.5">
+                    <span className="flex items-center gap-1">
+                      <Volume2 className="w-3.5 h-3.5 text-amber-400" />
+                      Volume
+                    </span>
+                    <span className="text-[10px] text-slate-400">{Math.round(volume * 100)}%</span>
+                  </div>
+                  <input
+                    type="range"
+                    min="0"
+                    max="1"
+                    step="0.01"
+                    value={volume}
+                    onChange={handleVolumeChange}
+                    className="w-full accent-amber-400 h-1.5 bg-slate-800 rounded-lg cursor-pointer"
+                  />
+                </div>
+              </div>
+            )}
+          </div>
 
           {/* Reversed Cards Toggle */}
           <button

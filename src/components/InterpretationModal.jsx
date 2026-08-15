@@ -6,12 +6,13 @@ import { CardDetailModal } from './CardDetailModal';
 import { 
   X, Sparkles, BookOpen, Share2, Copy, Bookmark,
   RotateCcw, Check, Flame, Droplets, Wind, Mountain, 
-  Feather, Shield, Sun, Star, ZoomIn, Eye 
+  Feather, Shield, Sun, Star, ZoomIn, Eye, Download, Image as ImageIcon
 } from 'lucide-react';
 import { SUITS } from '../data/tarotDeck';
 import { audio } from '../utils/audio';
 import { historyService } from '../utils/history';
 import { aiOracleService } from '../utils/aiOracle';
+import { cardImageExportService } from '../utils/cardImageExport';
 
 export const InterpretationModal = ({ 
   spreadConfig, 
@@ -25,36 +26,28 @@ export const InterpretationModal = ({
   const [aiReading, setAiReading] = useState(null);
   const [isLoadingAi, setIsLoadingAi] = useState(true);
   const [selectedCardDetail, setSelectedCardDetail] = useState(null);
+  const [isExporting, setIsExporting] = useState(false);
+  const [shareNotice, setShareNotice] = useState(false);
 
   // Compute elemental and arcana balance
   const stats = {
-    majorCount: 0,
-    wandsCount: 0,
-    cupsCount: 0,
-    swordsCount: 0,
-    pentaclesCount: 0,
+    majorCount: chosenCards.filter(c => c.arcana === 'Major').length,
+    wandsCount: chosenCards.filter(c => c.suit === 'wands').length,
+    cupsCount: chosenCards.filter(c => c.suit === 'cups').length,
+    swordsCount: chosenCards.filter(c => c.suit === 'swords').length,
+    pentaclesCount: chosenCards.filter(c => c.suit === 'pentacles').length,
   };
 
-  chosenCards.forEach((c) => {
-    if (!c) return;
-    if (c.arcana === 'Major') stats.majorCount++;
-    if (c.suit === 'wands') stats.wandsCount++;
-    if (c.suit === 'cups') stats.cupsCount++;
-    if (c.suit === 'swords') stats.swordsCount++;
-    if (c.suit === 'pentacles') stats.pentaclesCount++;
-  });
-
   useEffect(() => {
-    // Launch celestial star confetti
-    try {
-      confetti({
-        particleCount: 75,
-        spread: 85,
-        origin: { y: 0.45 },
-        colors: ['#FBBF24', '#C084FC', '#F59E0B', '#38BDF8', '#FFFFFF'],
-      });
-    } catch (e) {}
+    // Trigger celebration star confetti burst on reveal
+    confetti({
+      particleCount: 55,
+      spread: 70,
+      origin: { y: 0.6 },
+      colors: ['#F59E0B', '#C084FC', '#FDE68A', '#7C3AED', '#38BDF8']
+    });
 
+    // Generate real AI reading via Cloudflare Worker Proxy
     const loadInterpretation = async () => {
       setIsLoadingAi(true);
       try {
@@ -64,14 +57,9 @@ export const InterpretationModal = ({
           userQuestion
         });
         setAiReading(result);
-      } catch (e) {
-        console.error('Error generating AI synthesis', e);
-        const fallback = aiOracleService.generateOfflineFallback({
-          spreadConfig,
-          chosenCards,
-          userQuestion
-        });
-        setAiReading(fallback);
+      } catch (err) {
+        console.error('Error generating AI reading:', err);
+        setAiReading(aiOracleService.generateOfflineFallback({ spreadConfig, chosenCards, userQuestion }));
       } finally {
         setIsLoadingAi(false);
       }
@@ -102,6 +90,38 @@ export const InterpretationModal = ({
     navigator.clipboard.writeText(lines.filter(Boolean).join('\n'));
     setCopied(true);
     setTimeout(() => setCopied(false), 2500);
+  };
+
+  const handleExportImage = async () => {
+    audio.playPaperRustle();
+    setIsExporting(true);
+    await cardImageExportService.downloadReadingImage({
+      spreadConfig,
+      chosenCards: chosenCards.map((c, i) => ({
+        ...c,
+        positionName: spreadConfig.positions?.[i]?.name || `Arcano ${i + 1}`
+      })),
+      userQuestion,
+      oracleSynthesis: aiReading
+    });
+    setIsExporting(false);
+  };
+
+  const handleShareReading = async () => {
+    audio.playSelect();
+    const res = await cardImageExportService.shareReadingNative({
+      spreadConfig,
+      chosenCards: chosenCards.map((c, i) => ({
+        ...c,
+        positionName: spreadConfig.positions?.[i]?.name || `Arcano ${i + 1}`
+      })),
+      userQuestion,
+      oracleSynthesis: aiReading
+    });
+    if (res?.method === 'clipboard') {
+      setShareNotice(true);
+      setTimeout(() => setShareNotice(false), 2500);
+    }
   };
 
   const handleReset = () => {
@@ -370,14 +390,35 @@ export const InterpretationModal = ({
 
         {/* Bottom Actions Bar - Full Mobile Width */}
         <div className="p-4 sm:p-6 border-t border-amber-500/20 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 bg-slate-950/60 backdrop-blur-md">
-          <div className="flex items-center gap-2 w-full sm:w-auto">
+          <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
             <button
               type="button"
               onClick={handleCopyReading}
-              className="flex-1 sm:flex-initial px-4 py-2.5 rounded-xl bg-purple-950/80 hover:bg-purple-900 border border-purple-500/40 text-purple-200 hover:text-amber-200 text-xs font-semibold flex items-center justify-center gap-2 transition-all cursor-pointer shadow-md active:scale-95"
+              className="flex-1 sm:flex-initial px-3.5 py-2.5 rounded-xl bg-purple-950/80 hover:bg-purple-900 border border-purple-500/40 text-purple-200 hover:text-amber-200 text-xs font-semibold flex items-center justify-center gap-1.5 transition-all cursor-pointer shadow-md active:scale-95"
             >
               {copied ? <Check className="w-4 h-4 text-emerald-400" /> : <Copy className="w-4 h-4" />}
-              <span>{copied ? 'Copiada!' : 'Copiar Leitura'}</span>
+              <span>{copied ? 'Copiada!' : 'Copiar Texto'}</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={handleExportImage}
+              disabled={isExporting}
+              title="Baixar imagem em alta resolução para Instagram/Stories"
+              className="flex-1 sm:flex-initial px-3.5 py-2.5 rounded-xl bg-amber-950/60 hover:bg-amber-900/80 border border-amber-500/40 text-amber-200 text-xs font-semibold flex items-center justify-center gap-1.5 transition-all cursor-pointer shadow-md active:scale-95 disabled:opacity-50"
+            >
+              <Download className={`w-4 h-4 ${isExporting ? 'animate-bounce' : ''}`} />
+              <span>{isExporting ? 'Gerando...' : 'Baixar Imagem'}</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={handleShareReading}
+              title="Compartilhar leitura no WhatsApp ou outros aplicativos"
+              className="flex-1 sm:flex-initial px-3.5 py-2.5 rounded-xl bg-slate-900 hover:bg-purple-950/80 border border-purple-500/40 text-purple-200 hover:text-amber-200 text-xs font-semibold flex items-center justify-center gap-1.5 transition-all cursor-pointer shadow-md active:scale-95"
+            >
+              {shareNotice ? <Check className="w-4 h-4 text-emerald-400" /> : <Share2 className="w-4 h-4 text-purple-400" />}
+              <span>{shareNotice ? 'Copiado!' : 'Compartilhar'}</span>
             </button>
 
             <button
@@ -393,7 +434,7 @@ export const InterpretationModal = ({
                 setSaved(true);
                 setTimeout(() => setSaved(false), 3000);
               }}
-              className={`flex-1 sm:flex-initial px-4 py-2.5 rounded-xl border text-xs font-semibold flex items-center justify-center gap-2 transition-all cursor-pointer shadow-md active:scale-95
+              className={`flex-1 sm:flex-initial px-3.5 py-2.5 rounded-xl border text-xs font-semibold flex items-center justify-center gap-1.5 transition-all cursor-pointer shadow-md active:scale-95
                 ${saved 
                   ? 'bg-emerald-950/80 border-emerald-400 text-emerald-300' 
                   : 'glass-panel-subtle hover:border-amber-400/60 text-amber-300'
@@ -401,7 +442,7 @@ export const InterpretationModal = ({
               `}
             >
               {saved ? <Check className="w-4 h-4 text-emerald-400" /> : <Bookmark className="w-4 h-4 text-amber-400" />}
-              <span>{saved ? 'Salvo no Diário!' : 'Salvar no Diário'}</span>
+              <span>{saved ? 'Salvo!' : 'Salvar no Diário'}</span>
             </button>
           </div>
 

@@ -8,6 +8,20 @@ export default defineConfig({
     react(),
     tailwindcss(),
   ],
+  build: {
+    target: 'esnext',
+    cssCodeSplit: true,
+    chunkSizeWarningLimit: 600,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          'vendor-react': ['react', 'react-dom'],
+          'vendor-motion': ['framer-motion'],
+          'vendor-ui': ['lucide-react', 'canvas-confetti'],
+        }
+      }
+    }
+  },
   server: {
     port: 5173,
     open: false,

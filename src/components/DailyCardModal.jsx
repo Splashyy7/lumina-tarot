@@ -20,12 +20,12 @@ export const DailyCardModal = ({
     onClose();
   };
 
-  // Deterministic Daily Seed calculation based on local date string YYYY-MM-DD
-  const dailyCard = useMemo(() => {
+  // Deterministic Daily Seed calculation & Daily Streak tracking
+  const { dailyCard, streak } = useMemo(() => {
     const today = new Date();
-    const dateStr = `${today.getFullYear()}-${today.getMonth() + 1}-${today.getDate()}`;
+    const dateStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
     
-    // Simple hash function for date string
+    // Hash function for date string
     let hash = 0;
     for (let i = 0; i < dateStr.length; i++) {
       hash = ((hash << 5) - hash) + dateStr.charCodeAt(i);
@@ -33,7 +33,32 @@ export const DailyCardModal = ({
     }
     
     const index = Math.abs(hash) % TAROT_DECK.length;
-    return TAROT_DECK[index];
+    const card = TAROT_DECK[index];
+
+    // Compute Streak
+    let currentStreak = 1;
+    try {
+      const lastDate = localStorage.getItem('lumina_last_daily_date');
+      const savedStreak = parseInt(localStorage.getItem('lumina_daily_streak') || '0', 10);
+      
+      if (lastDate === dateStr) {
+        currentStreak = Math.max(1, savedStreak);
+      } else {
+        const yesterday = new Date();
+        yesterday.setDate(yesterday.getDate() - 1);
+        const yStr = `${yesterday.getFullYear()}-${String(yesterday.getMonth() + 1).padStart(2, '0')}-${String(yesterday.getDate()).padStart(2, '0')}`;
+        
+        if (lastDate === yStr) {
+          currentStreak = savedStreak + 1;
+        } else {
+          currentStreak = 1;
+        }
+        localStorage.setItem('lumina_last_daily_date', dateStr);
+        localStorage.setItem('lumina_daily_streak', String(currentStreak));
+      }
+    } catch (e) {}
+
+    return { dailyCard: card, streak: currentStreak };
   }, []);
 
   const todayFormatted = new Date().toLocaleDateString('pt-BR', {
@@ -75,11 +100,20 @@ export const DailyCardModal = ({
           <X className="w-5 h-5" />
         </button>
 
-        {/* Date & Title */}
+        {/* Date, Streak & Title */}
         <div className="mb-6 flex flex-col items-center">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-400/10 border border-amber-400/30 text-amber-300 text-xs font-cinzel font-semibold mb-2">
-            <Sun className="w-3.5 h-3.5 text-amber-400 animate-spin" style={{ animationDuration: '8s' }} />
-            <span className="capitalize">{todayFormatted}</span>
+          <div className="flex flex-wrap items-center justify-center gap-2 mb-2">
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-400/10 border border-amber-400/30 text-amber-300 text-xs font-cinzel font-semibold">
+              <Sun className="w-3.5 h-3.5 text-amber-400 animate-spin" style={{ animationDuration: '8s' }} />
+              <span className="capitalize">{todayFormatted}</span>
+            </div>
+
+            {streak > 0 && (
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-purple-950/80 border border-purple-400/40 text-purple-200 text-xs font-cinzel font-semibold shadow-sm">
+                <Flame className="w-3.5 h-3.5 text-amber-400 fill-amber-400 animate-pulse" />
+                <span>{streak} {streak === 1 ? 'Dia de Conexão' : 'Dias Consecutivos'}</span>
+              </div>
+            )}
           </div>
 
           <h3 className="font-cinzel text-xl sm:text-3xl font-black text-slate-100 gold-gradient-text tracking-wide">

@@ -1,12 +1,11 @@
 // Bulletproof Sanctuary Ambient Music Manager (Dual-Engine: HTML5 Audio + Web Audio Fallback for GitHub Pages)
-import sanctuaryAudioUrl from '../assets/audio/sanctuary.mp3';
 
 class BackgroundMusicService {
   constructor() {
     this.audio = null;
     this.isPlaying = false;
     this.isLoading = false;
-    this.volume = 0.15; // Set low and gentle (15% volume)
+    this.volume = 0.15; // Set gentle (15% volume default)
     this.isInitialized = false;
     this.webAudioCtx = null;
     this.webAudioSource = null;
@@ -30,9 +29,6 @@ class BackgroundMusicService {
   }
 
   getResolvedUrl() {
-    if (sanctuaryAudioUrl) return sanctuaryAudioUrl;
-    
-    // Fallback URL calculations for GitHub Pages repo subdirectories
     const base = import.meta.env.BASE_URL || './';
     const cleanBase = base.endsWith('/') ? base : `${base}/`;
     return `${cleanBase}audio/sanctuary.mp3`;

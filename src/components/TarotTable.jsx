@@ -5,22 +5,24 @@ import { Header } from './Header';
 import { SpreadSelector } from './SpreadSelector';
 import { SpreadArea } from './SpreadArea';
 import { DeckSelectionGrid } from './DeckSelectionGrid';
-import { CardDetailModal } from './CardDetailModal';
-import { InterpretationModal } from './InterpretationModal';
-import { GuideModal } from './GuideModal';
-import { GrimoireModal } from './GrimoireModal';
-import { ReadingHistoryModal } from './ReadingHistoryModal';
-import { DailyCardModal } from './DailyCardModal';
-import { ThemeSelectorModal } from './ThemeSelectorModal';
-import { YesNoOracleModal } from './YesNoOracleModal';
-import { DestinySummonAnimation } from './DestinySummonAnimation';
-import { ConfirmSpreadChangeModal } from './ConfirmSpreadChangeModal';
 import { MobileBottomDock } from './MobileBottomDock';
 import { BackgroundStars } from './BackgroundStars';
 import { historyService } from '../utils/history';
 import { themeService } from '../utils/theme';
 import { bgMusicService } from '../utils/bgMusic';
 import { audio } from '../utils/audio';
+
+// Lazy-loaded Modals for near-instant initial page loads (Code Splitting)
+const CardDetailModal = React.lazy(() => import('./CardDetailModal').then(m => ({ default: m.CardDetailModal })));
+const InterpretationModal = React.lazy(() => import('./InterpretationModal').then(m => ({ default: m.InterpretationModal })));
+const GuideModal = React.lazy(() => import('./GuideModal').then(m => ({ default: m.GuideModal })));
+const GrimoireModal = React.lazy(() => import('./GrimoireModal').then(m => ({ default: m.GrimoireModal })));
+const ReadingHistoryModal = React.lazy(() => import('./ReadingHistoryModal').then(m => ({ default: m.ReadingHistoryModal })));
+const DailyCardModal = React.lazy(() => import('./DailyCardModal').then(m => ({ default: m.DailyCardModal })));
+const ThemeSelectorModal = React.lazy(() => import('./ThemeSelectorModal').then(m => ({ default: m.ThemeSelectorModal })));
+const YesNoOracleModal = React.lazy(() => import('./YesNoOracleModal').then(m => ({ default: m.YesNoOracleModal })));
+const DestinySummonAnimation = React.lazy(() => import('./DestinySummonAnimation').then(m => ({ default: m.DestinySummonAnimation })));
+const ConfirmSpreadChangeModal = React.lazy(() => import('./ConfirmSpreadChangeModal').then(m => ({ default: m.ConfirmSpreadChangeModal })));
 
 // Fisher-Yates Deck Shuffle Utility
 const shuffleArray = (array) => {
@@ -375,92 +377,95 @@ export const TarotTable = () => {
         currentTheme={currentTheme}
       />
 
-      {/* Single Card Inspector Modal */}
-      {inspectingCardData && (
-        <CardDetailModal
-          card={inspectingCardData.card}
-          positionInfo={inspectingCardData.positionInfo}
-          onClose={() => setInspectingCardData(null)}
-        />
-      )}
+      {/* Lazy Modals Suspense Boundary */}
+      <React.Suspense fallback={null}>
+        {/* Single Card Inspector Modal */}
+        {inspectingCardData && (
+          <CardDetailModal
+            card={inspectingCardData.card}
+            positionInfo={inspectingCardData.positionInfo}
+            onClose={() => setInspectingCardData(null)}
+          />
+        )}
 
-      {/* Full Reading Interpretation Modal */}
-      {isInterpretationOpen && (
-        <InterpretationModal
-          spreadConfig={activeSpread}
-          chosenCards={chosenCards.filter(Boolean)}
-          userQuestion={userQuestion}
+        {/* Full Reading Interpretation Modal */}
+        {isInterpretationOpen && (
+          <InterpretationModal
+            spreadConfig={activeSpread}
+            chosenCards={chosenCards.filter(Boolean)}
+            userQuestion={userQuestion}
+            onClose={() => {
+              refreshHistoryCount();
+              setIsInterpretationOpen(false);
+            }}
+            onResetReading={handleResetSpread}
+          />
+        )}
+
+        {/* Oracle Guide Modal */}
+        <GuideModal
+          isOpen={isGuideOpen}
+          onClose={() => setIsGuideOpen(false)}
+        />
+
+        {/* Grimoire Codex Modal (78 cards encyclopedia) */}
+        <GrimoireModal
+          isOpen={isGrimoireOpen}
+          onClose={() => setIsGrimoireOpen(false)}
+          onOpenCardDetail={(card) => setInspectingCardData({ card, positionInfo: null })}
+        />
+
+        {/* Reading Journal History Modal */}
+        <ReadingHistoryModal
+          isOpen={isHistoryOpen}
           onClose={() => {
             refreshHistoryCount();
-            setIsInterpretationOpen(false);
+            setIsHistoryOpen(false);
           }}
-          onResetReading={handleResetSpread}
+          onOpenCardDetail={(card, pos) => setInspectingCardData({ card, positionInfo: pos })}
         />
-      )}
 
-      {/* Oracle Guide Modal */}
-      <GuideModal
-        isOpen={isGuideOpen}
-        onClose={() => setIsGuideOpen(false)}
-      />
-
-      {/* Grimoire Codex Modal (78 cards encyclopedia) */}
-      <GrimoireModal
-        isOpen={isGrimoireOpen}
-        onClose={() => setIsGrimoireOpen(false)}
-        onOpenCardDetail={(card) => setInspectingCardData({ card, positionInfo: null })}
-      />
-
-      {/* Reading Journal History Modal */}
-      <ReadingHistoryModal
-        isOpen={isHistoryOpen}
-        onClose={() => {
-          refreshHistoryCount();
-          setIsHistoryOpen(false);
-        }}
-        onOpenCardDetail={(card, pos) => setInspectingCardData({ card, positionInfo: pos })}
-      />
-
-      {/* Daily Card Modal */}
-      <DailyCardModal
-        isOpen={isDailyOpen}
-        onClose={() => setIsDailyOpen(false)}
-        onOpenCardDetail={(card) => setInspectingCardData({ card, positionInfo: null })}
-      />
-
-      {/* Sanctuary Altar Theme Selector Modal */}
-      <ThemeSelectorModal
-        isOpen={isThemesOpen}
-        currentTheme={currentTheme}
-        onSelectTheme={handleSelectTheme}
-        onClose={() => setIsThemesOpen(false)}
-      />
-
-      {/* Yes / No Oracle Direct Modal */}
-      <YesNoOracleModal
-        isOpen={isYesNoOpen}
-        allowReversed={allowReversed}
-        onClose={() => setIsYesNoOpen(false)}
-      />
-
-      {/* Full Cinematic Genshin-style Shooting Star Destiny Summon Animation Overlay */}
-      {destinySummonData && (
-        <DestinySummonAnimation
-          cardsToSummon={destinySummonData}
-          spreadConfig={activeSpread}
-          onComplete={handleDestinySummonComplete}
-          onCancel={() => setDestinySummonData(null)}
+        {/* Daily Card Modal */}
+        <DailyCardModal
+          isOpen={isDailyOpen}
+          onClose={() => setIsDailyOpen(false)}
+          onOpenCardDetail={(card) => setInspectingCardData({ card, positionInfo: null })}
         />
-      )}
 
-      {/* Custom Mystical Confirm Spread Change Overlay Modal */}
-      <ConfirmSpreadChangeModal
-        isOpen={Boolean(pendingSpreadChange)}
-        targetSpread={pendingSpreadChange}
-        currentSpread={activeSpread}
-        onConfirm={handleConfirmSpreadChange}
-        onCancel={() => setPendingSpreadChange(null)}
-      />
+        {/* Sanctuary Altar Theme Selector Modal */}
+        <ThemeSelectorModal
+          isOpen={isThemesOpen}
+          currentTheme={currentTheme}
+          onSelectTheme={handleSelectTheme}
+          onClose={() => setIsThemesOpen(false)}
+        />
+
+        {/* Yes / No Oracle Direct Modal */}
+        <YesNoOracleModal
+          isOpen={isYesNoOpen}
+          allowReversed={allowReversed}
+          onClose={() => setIsYesNoOpen(false)}
+        />
+
+        {/* Full Cinematic Genshin-style Shooting Star Destiny Summon Animation Overlay */}
+        {destinySummonData && (
+          <DestinySummonAnimation
+            cardsToSummon={destinySummonData}
+            spreadConfig={activeSpread}
+            onComplete={handleDestinySummonComplete}
+            onCancel={() => setDestinySummonData(null)}
+          />
+        )}
+
+        {/* Custom Mystical Confirm Spread Change Overlay Modal */}
+        <ConfirmSpreadChangeModal
+          isOpen={Boolean(pendingSpreadChange)}
+          targetSpread={pendingSpreadChange}
+          currentSpread={activeSpread}
+          onConfirm={handleConfirmSpreadChange}
+          onCancel={() => setPendingSpreadChange(null)}
+        />
+      </React.Suspense>
     </div>
   );
 };
