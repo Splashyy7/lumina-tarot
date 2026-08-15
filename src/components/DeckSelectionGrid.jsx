@@ -114,14 +114,16 @@ export const DeckSelectionGrid = ({
               <button
                 type="button"
                 onClick={handleRandomPick}
-                className="relative group px-4 sm:px-5 py-2 sm:py-2.5 rounded-xl bg-gradient-to-r from-amber-600 via-yellow-500 to-amber-600 hover:from-yellow-500 hover:to-amber-400 text-slate-950 text-xs sm:text-sm font-cinzel font-black flex items-center justify-center gap-2 transition-all shadow-[0_0_20px_rgba(251,191,36,0.45)] hover:shadow-[0_0_35px_rgba(251,191,36,0.8)] border border-amber-300/80 active:scale-95 cursor-pointer overflow-hidden animate-pulse"
+                className="relative group px-5 py-2.5 rounded-xl bg-gradient-to-b from-[#221345] via-[#140A2E] to-[#0B051C] hover:from-[#2E1B5D] hover:to-[#170C36] text-amber-200 hover:text-amber-100 flex items-center justify-center gap-2.5 transition-all duration-300 shadow-[0_6px_22px_rgba(0,0,0,0.6),inset_0_1px_1px_rgba(251,191,36,0.35)] hover:shadow-[0_8px_28px_rgba(245,158,11,0.25)] border border-amber-400/70 hover:border-amber-300 active:scale-95 cursor-pointer overflow-hidden"
               >
-                {/* Shimmer Light Reflection Sweep on Hover */}
-                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/35 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 pointer-events-none" />
-                
-                <Sparkles className="w-4 h-4 text-slate-950 animate-spin" style={{ animationDuration: '4s' }} />
-                <span>Escolha Guiada pelo Destino</span>
-                <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-slate-950/90 text-amber-300 font-sans font-bold">
+                {/* Subtle light streak */}
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-amber-300/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 pointer-events-none" />
+
+                <Flame className="w-4 h-4 text-amber-400 fill-amber-400/30 group-hover:scale-125 transition-transform duration-300 shrink-0" />
+                <span className="font-almendra font-bold text-lg tracking-wider shimmer-gold-text">
+                  Tiragem do Destino
+                </span>
+                <span className="text-[11px] px-2 py-0.5 rounded-full bg-amber-500/20 border border-amber-400/40 text-amber-300 font-cinzel font-semibold">
                   {remainingToPick}
                 </span>
               </button>

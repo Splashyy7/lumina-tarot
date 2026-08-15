@@ -418,30 +418,35 @@ export const SpreadArea = ({
         <AnimatePresence>
           {isComplete && (
             <motion.div 
-              initial={{ opacity: 0, scale: 0.85, y: 15 }}
+              initial={{ opacity: 0, scale: 0.9, y: 15 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.85, y: 10 }}
-              transition={{ type: "spring", stiffness: 400, damping: 25 }}
+              exit={{ opacity: 0, scale: 0.9, y: 10 }}
+              transition={{ type: "spring", stiffness: 350, damping: 24 }}
               className="relative z-10 mt-8 pt-6 border-t border-amber-500/20 flex flex-col items-center justify-center"
             >
               <div className="relative group">
-                <div className="absolute -inset-1 rounded-full bg-gradient-to-r from-amber-500 via-purple-500 to-amber-400 blur-lg opacity-75 group-hover:opacity-100 transition duration-500 animate-pulse" />
+                <div className="absolute -inset-1.5 rounded-2xl bg-gradient-to-r from-amber-500/40 via-purple-600/40 to-amber-500/40 blur-lg opacity-75 group-hover:opacity-100 transition duration-500" />
                 
                 <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
+                  whileHover={{ scale: 1.03 }}
+                  whileTap={{ scale: 0.97 }}
                   type="button"
                   onClick={handleOpenInterpretation}
-                  className="relative px-8 py-4 rounded-full bg-gradient-to-r from-amber-600 via-amber-500 to-amber-600 hover:from-amber-500 hover:to-amber-400 text-slate-950 font-cinzel font-bold text-sm md:text-base tracking-wider shadow-2xl flex items-center gap-3 border border-amber-200/80 cursor-pointer"
+                  className="relative px-9 py-4 rounded-2xl bg-gradient-to-b from-[#2B1758] via-[#160B30] to-[#0A0419] hover:from-[#371F70] hover:to-[#1B0D3B] text-amber-100 hover:text-white shadow-[0_12px_40px_rgba(0,0,0,0.85),inset_0_1px_1px_rgba(251,191,36,0.4)] flex items-center gap-3.5 border-2 border-amber-400/80 hover:border-amber-300 transition-all duration-300 cursor-pointer overflow-hidden"
                 >
-                  <BookOpen className="w-5 h-5 text-slate-950" />
-                  <span>Ver Interpretação Completa</span>
-                  <Sparkles className="w-5 h-5 text-slate-950 animate-bounce" />
+                  {/* Sweep Light Reflection */}
+                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-amber-300/15 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 pointer-events-none" />
+
+                  <BookOpen className="w-5 h-5 text-amber-300 shrink-0" />
+                  <span className="font-almendra text-2xl font-bold tracking-wider shimmer-gold-text">
+                    Revelar Interpretação dos Arcanos
+                  </span>
+                  <Compass className="w-5 h-5 text-amber-400/90 group-hover:rotate-90 transition-transform duration-700 shrink-0" />
                 </motion.button>
               </div>
 
-              <p className="text-xs text-amber-200/75 mt-2.5 font-light text-center">
-                Todas as {totalSlots} cartas foram consagradas na mesa. Descubra a leitura oracular.
+              <p className="text-sm text-amber-200/80 mt-2.5 font-almendra italic text-center tracking-wide">
+                Todas as {totalSlots} cartas foram consagradas na mesa. Consulte a síntese do oráculo.
               </p>
             </motion.div>
           )}

@@ -1,7 +1,7 @@
 import React from 'react';
 import { 
   Layers, Sparkles, BookOpen, Bookmark, 
-  Palette, HelpCircle, Sun, Heart, Compass 
+  Palette, HelpCircle, Sun, Heart, Compass, Flame 
 } from 'lucide-react';
 import { audio } from '../utils/audio';
 
@@ -39,12 +39,12 @@ export const MobileBottomDock = ({
         onClick={() => {
           if (onOpenDestiny) onOpenDestiny();
         }}
-        className="flex flex-col items-center gap-0.5 text-amber-400 p-1 relative -top-2"
+        className="flex flex-col items-center gap-0.5 text-amber-300 p-1 relative -top-2 cursor-pointer active:scale-95"
       >
-        <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-amber-600 to-yellow-400 flex items-center justify-center text-slate-950 shadow-[0_0_15px_rgba(251,191,36,0.6)] animate-pulse">
-          <Sparkles className="w-5 h-5 animate-spin" style={{ animationDuration: '6s' }} />
+        <div className="w-10 h-10 rounded-full bg-gradient-to-b from-[#2D1B69] to-[#120A2B] border border-amber-400/80 flex items-center justify-center text-amber-300 shadow-[0_0_15px_rgba(245,158,11,0.4)]">
+          <Flame className="w-5 h-5 text-amber-400 fill-amber-400/30" />
         </div>
-        <span className="text-[9px] font-cinzel font-bold text-amber-300">Destino</span>
+        <span className="text-[10px] font-cormorant font-bold text-amber-300 tracking-wide">Destino</span>
       </button>
 
       {/* 3. Sim ou Não */}

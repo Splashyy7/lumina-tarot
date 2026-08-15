@@ -170,13 +170,14 @@ export const LoadingScreen = ({ onLoaded }) => {
             /* Ready State: Portal Entry Button that guarantees user audio unlock */
             <motion.div
               key="enter"
-              initial={{ opacity: 0, scale: 0.85, y: 10 }}
+              initial={{ opacity: 0, scale: 0.9, y: 10 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
-              transition={{ type: "spring", stiffness: 400, damping: 20 }}
+              transition={{ type: "spring", stiffness: 350, damping: 22 }}
               className="w-full flex flex-col items-center"
             >
               <div className="relative group w-full flex justify-center">
-                <div className="absolute -inset-1 rounded-full bg-gradient-to-r from-amber-500 via-purple-500 to-amber-400 blur-md opacity-80 group-hover:opacity-100 transition animate-pulse" />
+                {/* Subtle Amber Halo */}
+                <div className="absolute -inset-1 rounded-2xl bg-gradient-to-r from-amber-500/40 via-purple-600/30 to-amber-500/40 blur-lg opacity-70 group-hover:opacity-100 transition duration-500" />
                 
                 <button
                   type="button"
@@ -184,16 +185,21 @@ export const LoadingScreen = ({ onLoaded }) => {
                     e.stopPropagation();
                     handleEnter();
                   }}
-                  className="relative px-7 py-3 rounded-full bg-gradient-to-r from-amber-600 via-amber-500 to-amber-600 hover:from-amber-500 hover:to-amber-400 text-slate-950 font-cinzel font-bold text-xs md:text-sm tracking-widest shadow-2xl flex items-center gap-2 border border-amber-200/80 cursor-pointer active:scale-95"
+                  className="relative px-9 py-3.5 rounded-2xl bg-gradient-to-b from-[#1C103B] via-[#100726] to-[#080417] hover:from-[#281854] hover:to-[#110729] border-2 border-amber-400/70 hover:border-amber-300 text-amber-100 shadow-[0_12px_40px_rgba(0,0,0,0.85),inset_0_1px_1px_rgba(251,191,36,0.4)] flex items-center justify-center gap-3.5 transition-all duration-300 cursor-pointer active:scale-95 group/btn overflow-hidden"
                 >
-                  <Sparkles className="w-4 h-4 text-slate-950 animate-spin" style={{ animationDuration: '4s' }} />
-                  <span>ENTRAR NO SANTUÁRIO</span>
-                  <ArrowRight className="w-4 h-4 text-slate-950 animate-pulse" />
+                  {/* Sweep Light Reflection */}
+                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-amber-300/15 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 pointer-events-none" />
+                  
+                  <Compass className="w-5 h-5 text-amber-400 group-hover:rotate-90 transition-transform duration-700 shrink-0" />
+                  <span className="font-almendra text-2xl font-bold tracking-wider shimmer-gold-text">
+                    Entrar no Santuário
+                  </span>
+                  <ArrowRight className="w-4 h-4 text-amber-300 group-hover:translate-x-1.5 transition-transform duration-300 shrink-0" />
                 </button>
               </div>
 
-              <span className="text-[10px] text-amber-200/70 font-cinzel mt-2 tracking-wider">
-                Clique para abrir o oráculo
+              <span className="text-xs text-amber-200/70 font-almendra italic mt-2.5 tracking-wider">
+                Toque para despertar a mesa oracular
               </span>
             </motion.div>
           )}

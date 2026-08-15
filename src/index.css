@@ -4,6 +4,11 @@
   :root {
     --font-cinzel: 'Cinzel', serif;
     --font-cinzel-dec: 'Cinzel Decorative', serif;
+    --font-cormorant: 'Cormorant Garamond', 'Cinzel', Georgia, serif;
+    --font-almendra: 'Almendra', Georgia, serif;
+    --font-almendra-display: 'Almendra Display', cursive, serif;
+    --font-uncial: 'Uncial Antiqua', cursive, serif;
+    --font-medieval: 'MedievalSharp', cursive, serif;
     --font-outfit: 'Outfit', sans-serif;
   }
 
@@ -21,6 +26,41 @@
   .font-cinzel-dec {
     font-family: var(--font-cinzel-dec);
   }
+
+  .font-cormorant {
+    font-family: var(--font-cormorant);
+  }
+
+  .font-almendra {
+    font-family: var(--font-almendra);
+  }
+
+  .font-almendra-display {
+    font-family: var(--font-almendra-display);
+  }
+
+  .font-uncial {
+    font-family: var(--font-uncial);
+  }
+
+  .font-medieval {
+    font-family: var(--font-medieval);
+  }
+}
+
+/* Shimmering Metallic Gold Text */
+@keyframes shimmerGold {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.shimmer-gold-text {
+  background: linear-gradient(90deg, #FDE68A 0%, #FFFBEB 25%, #F59E0B 50%, #FDE68A 75%, #FFFBEB 100%);
+  background-size: 250% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: shimmerGold 4s ease-in-out infinite;
 }
 
 /* Custom Scrollbar */
