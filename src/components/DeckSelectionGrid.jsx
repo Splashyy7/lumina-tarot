@@ -143,7 +143,10 @@ export const DeckSelectionGrid = ({
                 return (
                   <button
                     key={tab.id}
-                    onClick={() => setActiveFilter(tab.id)}
+                    onClick={() => {
+                      audio.playTabSwitch();
+                      setActiveFilter(tab.id);
+                    }}
                     className={`px-3 py-1.5 rounded-lg text-xs font-medium flex items-center gap-1.5 shrink-0 transition-all cursor-pointer
                       ${isActive
                         ? 'bg-amber-400/20 text-amber-300 border border-amber-400/60 shadow-[0_0_12px_rgba(251,191,36,0.2)]'

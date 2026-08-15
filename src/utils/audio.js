@@ -1,10 +1,11 @@
-// Web Audio API Synthesizer for Mystical Tarot Soundscapes
+// Web Audio API Synthesizer for Mystical Tarot Soundscapes & Charming Sensory Feedback
 class MysticAudioEngine {
   constructor() {
     this.ctx = null;
     this.muted = false;
     this.initialized = false;
     this.loadingNodes = null;
+    this.lastCardHoverTime = 0;
     this.setupAutoUnlock();
   }
 
@@ -157,7 +158,39 @@ class MysticAudioEngine {
     }
   }
 
-  // Gentle ethereal chime on hover
+  // Ultra-Charming Micro-Chime when hovering over cards (Throttled for sweet acoustic smoothness)
+  playCardHover() {
+    if (this.muted) return;
+    const nowMs = Date.now();
+    if (nowMs - this.lastCardHoverTime < 50) return; // Prevent audio congestion
+    this.lastCardHoverTime = nowMs;
+
+    this.init();
+    if (!this.ctx) return;
+
+    try {
+      const now = this.ctx.currentTime;
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+
+      osc.type = 'sine';
+      // Ethereal Pentatonic high crystal scale
+      const pentatonic = [1174.66, 1318.51, 1567.98, 1760.0, 2093.0, 2349.32];
+      const freq = pentatonic[Math.floor(Math.random() * pentatonic.length)];
+      osc.frequency.setValueAtTime(freq, now);
+
+      gain.gain.setValueAtTime(0.012, now);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.12);
+
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+
+      osc.start(now);
+      osc.stop(now + 0.12);
+    } catch (e) {}
+  }
+
+  // Gentle ethereal chime on general UI hover
   playHover() {
     if (this.muted) return;
     this.init();
@@ -174,16 +207,50 @@ class MysticAudioEngine {
       osc.frequency.setValueAtTime(freq, now);
 
       gain.gain.setValueAtTime(0.022, now);
-      gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.35);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.28);
 
       osc.connect(gain);
       gain.connect(this.ctx.destination);
 
       osc.start(now);
-      osc.stop(now + 0.35);
-    } catch (e) {
-      // Graceful fallback
-    }
+      osc.stop(now + 0.28);
+    } catch (e) {}
+  }
+
+  // Tactile sound of card landing on velvet altar table with soft wooden resonance
+  playCardDeal() {
+    if (this.muted) return;
+    this.init();
+    if (!this.ctx) return;
+
+    try {
+      const now = this.ctx.currentTime;
+
+      // 1. Soft card paper snap
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(360, now);
+      osc.frequency.exponentialRampToValueAtTime(140, now + 0.08);
+      gain.gain.setValueAtTime(0.04, now);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.1);
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+      osc.start(now);
+      osc.stop(now + 0.1);
+
+      // 2. Altar sacred bell harmonic
+      const bell = this.ctx.createOscillator();
+      const bellGain = this.ctx.createGain();
+      bell.type = 'sine';
+      bell.frequency.setValueAtTime(659.25, now + 0.02);
+      bellGain.gain.setValueAtTime(0.025, now + 0.02);
+      bellGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.4);
+      bell.connect(bellGain);
+      bellGain.connect(this.ctx.destination);
+      bell.start(now + 0.02);
+      bell.stop(now + 0.4);
+    } catch (e) {}
   }
 
   // Deep resonant chime + whoosh when selecting a card
@@ -199,27 +266,94 @@ class MysticAudioEngine {
       const gain1 = this.ctx.createGain();
       osc1.type = 'sine';
       osc1.frequency.setValueAtTime(432, now);
-      osc1.frequency.exponentialRampToValueAtTime(216, now + 0.8);
-      gain1.gain.setValueAtTime(0.06, now);
-      gain1.gain.exponentialRampToValueAtTime(0.0001, now + 1.0);
+      osc1.frequency.exponentialRampToValueAtTime(216, now + 0.6);
+      gain1.gain.setValueAtTime(0.05, now);
+      gain1.gain.exponentialRampToValueAtTime(0.0001, now + 0.8);
       osc1.connect(gain1);
       gain1.connect(this.ctx.destination);
       osc1.start(now);
-      osc1.stop(now + 1.0);
+      osc1.stop(now + 0.8);
 
       const osc2 = this.ctx.createOscillator();
       const gain2 = this.ctx.createGain();
       osc2.type = 'triangle';
       osc2.frequency.setValueAtTime(864, now);
-      gain2.gain.setValueAtTime(0.03, now);
-      gain2.gain.exponentialRampToValueAtTime(0.0001, now + 0.8);
+      gain2.gain.setValueAtTime(0.025, now);
+      gain2.gain.exponentialRampToValueAtTime(0.0001, now + 0.6);
       osc2.connect(gain2);
       gain2.connect(this.ctx.destination);
       osc2.start(now);
-      osc2.stop(now + 0.8);
-    } catch (e) {
-      // Graceful fallback
-    }
+      osc2.stop(now + 0.6);
+    } catch (e) {}
+  }
+
+  // Spread Mode Change Glissando (Harmonic Harp Sweep)
+  playSpreadSwitch() {
+    if (this.muted) return;
+    this.init();
+    if (!this.ctx) return;
+
+    try {
+      const now = this.ctx.currentTime;
+      const notes = [440.0, 554.37, 659.25, 880.0];
+      notes.forEach((freq, idx) => {
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        const t = now + idx * 0.045;
+
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(freq, t);
+        gain.gain.setValueAtTime(0.02, t);
+        gain.gain.exponentialRampToValueAtTime(0.0001, t + 0.35);
+
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start(t);
+        osc.stop(t + 0.35);
+      });
+    } catch (e) {}
+  }
+
+  // Theme change astral resonance
+  playThemeChange() {
+    if (this.muted) return;
+    this.init();
+    if (!this.ctx) return;
+
+    try {
+      const now = this.ctx.currentTime;
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(528, now); // 528Hz Solfeggio Transformation
+      gain.gain.setValueAtTime(0.04, now);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + 1.2);
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+      osc.start(now);
+      osc.stop(now + 1.2);
+    } catch (e) {}
+  }
+
+  // Light crystal tap when switching tabs/filter categories
+  playTabSwitch() {
+    if (this.muted) return;
+    this.init();
+    if (!this.ctx) return;
+
+    try {
+      const now = this.ctx.currentTime;
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(987.77, now);
+      gain.gain.setValueAtTime(0.02, now);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.15);
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+      osc.start(now);
+      osc.stop(now + 0.15);
+    } catch (e) {}
   }
 
   // Card Flip / Reveal Shimmer
@@ -245,9 +379,7 @@ class MysticAudioEngine {
 
       osc.start(now);
       osc.stop(now + 0.45);
-    } catch (e) {
-      // Fallback
-    }
+    } catch (e) {}
   }
 
   // Grand Celestial Chord when all cards are revealed or interpretation opens
@@ -276,9 +408,7 @@ class MysticAudioEngine {
         osc.start(now + idx * 0.04);
         osc.stop(now + 2.5);
       });
-    } catch (e) {
-      // Fallback
-    }
+    } catch (e) {}
   }
 
   // Realistic Multi-Stage Deck Shuffle Sound
@@ -320,10 +450,7 @@ class MysticAudioEngine {
       bellGain.connect(this.ctx.destination);
       bellOsc.start(endBellTime);
       bellOsc.stop(endBellTime + 0.8);
-
-    } catch (e) {
-      // Fallback
-    }
+    } catch (e) {}
   }
 
   // Authentic Parchment Paper Rustle & Transcription Sound
@@ -387,9 +514,7 @@ class MysticAudioEngine {
       oscGain.connect(this.ctx.destination);
       osc.start(now + 0.04);
       osc.stop(now + 0.32);
-    } catch (e) {
-      // Fallback
-    }
+    } catch (e) {}
   }
 
   // Dedicated Sound for Removing a Single Card (Button 'X' on Slots)
@@ -424,9 +549,7 @@ class MysticAudioEngine {
       gain2.connect(this.ctx.destination);
       osc2.start(now + 0.02);
       osc2.stop(now + 0.16);
-    } catch (e) {
-      // Fallback
-    }
+    } catch (e) {}
   }
 
   // Dedicated Sound for Clearing the Entire Altar Table ("Limpar Mesa")
@@ -485,12 +608,10 @@ class MysticAudioEngine {
         osc.start(t);
         osc.stop(t + 0.2);
       });
-    } catch (e) {
-      // Fallback
-    }
+    } catch (e) {}
   }
 
-  // Dedicated Soft Dismissal Pop for Closing Modals (Gentle & Comfortable Volume)
+  // Dedicated Soft Dismissal Pop for Closing Modals
   playCloseModal() {
     if (this.muted) return;
     this.init();
@@ -514,9 +635,7 @@ class MysticAudioEngine {
       
       osc.start(now);
       osc.stop(now + 0.22);
-    } catch (e) {
-      // Fallback
-    }
+    } catch (e) {}
   }
 
   // Dedicated Sound for Zooming In / Inspecting a Tarot Card
@@ -554,12 +673,10 @@ class MysticAudioEngine {
       crystalGain.connect(this.ctx.destination);
       crystalOsc.start(now + 0.04);
       crystalOsc.stop(now + 0.32);
-    } catch (e) {
-      // Fallback
-    }
+    } catch (e) {}
   }
 
-  // Grand Mystical Sanctuary Entry Sound (Exiting loading screen / Temple unlock)
+  // Grand Mystical Sanctuary Entry Sound
   playTempleEntry() {
     if (this.muted) return;
     this.init();
@@ -611,15 +728,11 @@ class MysticAudioEngine {
       noiseGain.connect(this.ctx.destination);
       noise.start(now);
       noise.stop(now + 0.6);
-
-    } catch (e) {
-      // Fallback
-    }
+    } catch (e) {}
   }
 
   // ==================== GENSHIN-INSPIRED WISH & SHOOTING STAR SOUNDS ====================
   
-  // 1. Shooting Star Launch & Flight Swoosh (Ascending Celestial Sweep)
   playWishLaunch() {
     if (this.muted) return;
     this.init();
@@ -628,7 +741,6 @@ class MysticAudioEngine {
     try {
       const now = this.ctx.currentTime;
 
-      // Sweeping golden celestial oscillator
       const osc = this.ctx.createOscillator();
       const gain = this.ctx.createGain();
       const filter = this.ctx.createBiquadFilter();
@@ -653,7 +765,6 @@ class MysticAudioEngine {
       osc.start(now);
       osc.stop(now + 1.4);
 
-      // Trailing star dust high harmonics (Shimmer)
       const shimmerNotes = [523.25, 659.25, 783.99, 1046.50, 1318.51];
       shimmerNotes.forEach((freq, i) => {
         const sOsc = this.ctx.createOscillator();
@@ -671,7 +782,6 @@ class MysticAudioEngine {
     } catch (e) {}
   }
 
-  // 2. Starburst Impact Explosion (Warm Sub-Bass + Golden Cathedral Chimes)
   playStarImpact() {
     if (this.muted) return;
     this.init();
@@ -680,7 +790,6 @@ class MysticAudioEngine {
     try {
       const now = this.ctx.currentTime;
 
-      // Deep celestial bass impact
       const subOsc = this.ctx.createOscillator();
       const subGain = this.ctx.createGain();
       subOsc.type = 'sine';
@@ -695,7 +804,6 @@ class MysticAudioEngine {
       subOsc.start(now);
       subOsc.stop(now + 1.5);
 
-      // Radiant 5-Star Chime Burst Chord (D Major 9th Celestial)
       const chord = [293.66, 440.0, 587.33, 739.99, 880.0, 1174.66, 1760.0];
       chord.forEach((freq, idx) => {
         const osc = this.ctx.createOscillator();
@@ -716,7 +824,6 @@ class MysticAudioEngine {
     } catch (e) {}
   }
 
-  // 3. Card Summon Cascade (Fluttering cards appearing from star dust)
   playCardSummonCascade(count = 3) {
     if (this.muted) return;
     this.init();
@@ -742,6 +849,35 @@ class MysticAudioEngine {
         osc.start(time);
         osc.stop(time + 0.35);
       }
+    } catch (e) {}
+  }
+
+  // Dedicated Sound for Concluding a Reading (Warm Celestial Resolution Harmonic)
+  playConcludeReading() {
+    if (this.muted) return;
+    this.init();
+    if (!this.ctx) return;
+
+    try {
+      const now = this.ctx.currentTime;
+      // Celestial resolution chord (F Major 9th harmonic)
+      const chord = [349.23, 440.0, 523.25, 659.25, 880.0, 1046.50];
+      chord.forEach((freq, idx) => {
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+
+        osc.type = idx % 2 === 0 ? 'sine' : 'triangle';
+        osc.frequency.setValueAtTime(freq, now + idx * 0.025);
+
+        gain.gain.setValueAtTime(0.04 / (idx + 1), now + idx * 0.025);
+        gain.gain.exponentialRampToValueAtTime(0.0001, now + 2.0);
+
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+
+        osc.start(now + idx * 0.025);
+        osc.stop(now + 2.0);
+      });
     } catch (e) {}
   }
 }

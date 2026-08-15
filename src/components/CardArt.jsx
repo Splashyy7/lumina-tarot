@@ -8,6 +8,28 @@ import { SUITS } from '../data/tarotDeck';
 
 export const CardArt = React.memo(({ card, isMini = false, showKeywords = true }) => {
   const suitConfig = SUITS[card.suit.toUpperCase()] || SUITS.MAJOR;
+  const [tilt, setTilt] = React.useState({ x: 0, y: 0, glareX: 50, glareY: 50, isHovered: false });
+
+  const handleMouseMove = (e) => {
+    if (isMini) return;
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    const centerX = rect.width / 2;
+    const centerY = rect.height / 2;
+    
+    // Tilt calculations (-8deg to +8deg)
+    const rotateY = ((x - centerX) / centerX) * 8;
+    const rotateX = -((y - centerY) / centerY) * 8;
+    const glareX = (x / rect.width) * 100;
+    const glareY = (y / rect.height) * 100;
+    
+    setTilt({ x: rotateX, y: rotateY, glareX, glareY, isHovered: true });
+  };
+
+  const handleMouseLeave = () => {
+    setTilt({ x: 0, y: 0, glareX: 50, glareY: 50, isHovered: false });
+  };
 
   // Custom rich symbolic vector graphic generator for each Arcana
   const renderCardSymbolism = () => {
@@ -552,7 +574,26 @@ export const CardArt = React.memo(({ card, isMini = false, showKeywords = true }
   };
 
   return (
-    <div className={`relative w-full h-full rounded-xl flex flex-col justify-between overflow-hidden border bg-gradient-to-b ${suitConfig.bgGradient} ${suitConfig.borderGlow} transition-all duration-300 select-none shadow-2xl`}>
+    <div 
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
+      style={{
+        transform: tilt.isHovered ? `perspective(700px) rotateX(${tilt.x}deg) rotateY(${tilt.y}deg) scale3d(1.02, 1.02, 1.02)` : 'perspective(700px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)',
+        transition: tilt.isHovered ? 'transform 0.08s ease-out' : 'transform 0.4s ease-out',
+        transformStyle: 'preserve-3d'
+      }}
+      className={`relative w-full h-full rounded-xl flex flex-col justify-between overflow-hidden border bg-gradient-to-b ${suitConfig.bgGradient} ${suitConfig.borderGlow} select-none shadow-2xl`}
+    >
+      {/* Holographic Specular Glaze Sheen on Tilt */}
+      {tilt.isHovered && (
+        <div 
+          className="absolute inset-0 pointer-events-none z-30 opacity-40 mix-blend-overlay transition-opacity duration-200 rounded-xl"
+          style={{
+            background: `radial-gradient(circle at ${tilt.glareX}% ${tilt.glareY}%, rgba(255,255,255,0.9) 0%, rgba(251,191,36,0.4) 25%, transparent 65%)`
+          }}
+        />
+      )}
+
       {/* Background Sacred Geometric Grid Pattern */}
       <div className="absolute inset-0 opacity-15 pointer-events-none bg-[radial-gradient(#FBBF24_1px,transparent_1px)] [background-size:12px_12px]" />
 

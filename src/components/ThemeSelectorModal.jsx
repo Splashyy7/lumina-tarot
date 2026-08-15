@@ -25,7 +25,7 @@ export const ThemeSelectorModal = ({
   };
 
   const handleSelect = (theme) => {
-    audio.playSelect();
+    audio.playThemeChange();
     onSelectTheme(theme);
   };
 

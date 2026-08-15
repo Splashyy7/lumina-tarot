@@ -5,7 +5,7 @@ import { audio } from '../utils/audio';
 export const CardBack = React.memo(({ card, onClick, isSelected = false, index }) => {
   const handleMouseEnter = () => {
     if (!isSelected) {
-      audio.playHover();
+      audio.playCardHover();
     }
   };
 

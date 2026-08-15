@@ -326,6 +326,32 @@ export const SpreadArea = ({
     );
   };
 
+  // 8. Pentagram / 5 Elements Star Layout
+  const renderPentagramLayout = () => {
+    return (
+      <div className="flex flex-col items-center gap-4 py-4 max-w-4xl mx-auto animate-fade-in">
+        {/* Top: 2. Fogo (Ação) */}
+        <div className="flex flex-col items-center">
+          {renderSlot(1, 'md', false, true)}
+        </div>
+
+        {/* Middle row: 4. Ar (Left), 1. Espírito (Center), 3. Água (Right) */}
+        <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-8">
+          {renderSlot(3, 'md', false, true)}
+          <div className="scale-105">
+            {renderSlot(0, 'md', false, true)}
+          </div>
+          {renderSlot(2, 'md', false, true)}
+        </div>
+
+        {/* Bottom: 5. Terra (Matéria) */}
+        <div className="flex flex-col items-center">
+          {renderSlot(4, 'md', false, true)}
+        </div>
+      </div>
+    );
+  };
+
   // Dispatch layout based on spreadConfig.layoutType
   const renderLayoutContent = () => {
     switch (spreadConfig.layoutType) {
@@ -341,6 +367,8 @@ export const SpreadArea = ({
         return renderLoveLayout();
       case 'career':
         return renderCareerLayout();
+      case 'pentagram':
+        return renderPentagramLayout();
       case 'timeline':
       default:
         return renderTimelineLayout();

@@ -1,4 +1,4 @@
-// Oracle Reading History & Journal Service (LocalStorage)
+// Oracle Reading History & Journal Service (LocalStorage with Full Backup & Stats Analytics)
 const STORAGE_KEY = 'lumina_tarot_history_v1';
 
 const notifyUpdate = () => {
@@ -49,7 +49,7 @@ export const historyService = {
         notes: reading.notes || ''
       };
 
-      const updated = [newEntry, ...current].slice(0, 50); // Keep last 50 readings
+      const updated = [newEntry, ...current].slice(0, 100); // Keep last 100 readings
       localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
       notifyUpdate();
       return newEntry;
@@ -85,6 +85,69 @@ export const historyService = {
       console.error('Failed to update reading notes', e);
       return [];
     }
+  },
+
+  // Compute rich statistical analytics on historical readings
+  getReadingStats() {
+    const readings = this.getReadings();
+    const totalReadings = readings.length;
+    if (totalReadings === 0) {
+      return {
+        totalReadings: 0,
+        totalCardsDrawn: 0,
+        topCards: [],
+        elementalCounts: { major: 0, wands: 0, cups: 0, swords: 0, pentacles: 0 },
+        elementalPercentages: { major: 0, wands: 0, cups: 0, swords: 0, pentacles: 0 }
+      };
+    }
+
+    const cardCounts = {};
+    const elementalCounts = { major: 0, wands: 0, cups: 0, swords: 0, pentacles: 0 };
+    let totalCardsDrawn = 0;
+
+    readings.forEach(reading => {
+      (reading.cards || []).forEach(card => {
+        totalCardsDrawn++;
+        // Count card occurrences
+        if (!cardCounts[card.name]) {
+          cardCounts[card.name] = {
+            name: card.name,
+            arcana: card.arcana,
+            suit: card.suit,
+            roman: card.roman,
+            count: 0
+          };
+        }
+        cardCounts[card.name].count++;
+
+        // Element counts
+        if (card.arcana === 'Major') elementalCounts.major++;
+        else if (card.suit === 'wands') elementalCounts.wands++;
+        else if (card.suit === 'cups') elementalCounts.cups++;
+        else if (card.suit === 'swords') elementalCounts.swords++;
+        else if (card.suit === 'pentacles') elementalCounts.pentacles++;
+      });
+    });
+
+    const topCards = Object.values(cardCounts)
+      .sort((a, b) => b.count - a.count)
+      .slice(0, 5);
+
+    const calcPct = (val) => totalCardsDrawn > 0 ? Math.round((val / totalCardsDrawn) * 100) : 0;
+
+    return {
+      totalReadings,
+      totalCardsDrawn,
+      topCards,
+      elementalCounts,
+      elementalPercentages: {
+        major: calcPct(elementalCounts.major),
+        wands: calcPct(elementalCounts.wands),
+        cups: calcPct(elementalCounts.cups),
+        swords: calcPct(elementalCounts.swords),
+        pentacles: calcPct(elementalCounts.pentacles),
+      }
+    };
   },
 
   // Clear all history

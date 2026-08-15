@@ -291,5 +291,52 @@ export const SPREAD_TYPES = [
         section: 'staff'
       }
     ]
+  },
+  {
+    id: 'five_elements',
+    name: 'Estrela dos 5 Elementos (Harmonia Cósmica)',
+    shortName: 'Estrela dos 5 Elementos (5 Cartas)',
+    compactName: '5 Elementos',
+    cardCount: 5,
+    layoutType: 'pentagram',
+    icon: 'Star',
+    description: 'Diagnóstico holístico completo através dos 4 elementos da criação e da centelha sagrada do Éter/Espírito.',
+    positions: [
+      {
+        index: 0,
+        name: '1. O Espírito / Éter (Centro)',
+        subtitle: 'A essência central, a alma da questão e o propósito cósmico',
+        icon: 'Sparkles',
+        color: '#FBBF24'
+      },
+      {
+        index: 1,
+        name: '2. O Fogo (Vontade & Ação)',
+        subtitle: 'Sua energia realizadora, ambição e dinamismo criativo',
+        icon: 'Flame',
+        color: '#F97316'
+      },
+      {
+        index: 2,
+        name: '3. A Água (Coração & Emoção)',
+        subtitle: 'Seus sentimentos profundos, intuição e vínculos afetivos',
+        icon: 'Droplets',
+        color: '#38BDF8'
+      },
+      {
+        index: 3,
+        name: '4. O Ar (Mente & Comunicação)',
+        subtitle: 'Sua clareza intelectual, decisões e expressão da verdade',
+        icon: 'Wind',
+        color: '#E2E8F0'
+      },
+      {
+        index: 4,
+        name: '5. A Terra (Matéria & Concretização)',
+        subtitle: 'Seus alicerces materiais, estabilidade, finanças e corpo',
+        icon: 'Mountain',
+        color: '#34D399'
+      }
+    ]
   }
 ];

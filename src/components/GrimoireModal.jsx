@@ -107,7 +107,7 @@ export const GrimoireModal = ({
                 <button
                   key={tab.id}
                   onClick={() => {
-                    audio.playHover();
+                    audio.playTabSwitch();
                     setActiveFilter(tab.id);
                   }}
                   className={`px-3 py-1.5 rounded-xl text-xs font-medium flex items-center gap-1.5 shrink-0 transition-all cursor-pointer

@@ -1,8 +1,8 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { 
   X, Sparkles, Sun, Moon, Star, Calendar, 
-  Compass, Feather, Heart, Flame, Shield 
+  Compass, Feather, Heart, Flame, Shield, Bell, BellRing, Check 
 } from 'lucide-react';
 import { CardArt } from './CardArt';
 import { TAROT_DECK, SUITS } from '../data/tarotDeck';
@@ -13,11 +13,46 @@ export const DailyCardModal = ({
   onClose,
   onOpenCardDetail 
 }) => {
+  const [notificationEnabled, setNotificationEnabled] = useState(() => {
+    if (typeof window !== 'undefined' && 'Notification' in window) {
+      return Notification.permission === 'granted';
+    }
+    return false;
+  });
+  const [notifyFeedback, setNotifyFeedback] = useState(null);
+
   if (!isOpen) return null;
 
   const handleClose = () => {
     audio.playCloseModal();
     onClose();
+  };
+
+  const handleToggleNotifications = async () => {
+    audio.playSelect();
+    if (!('Notification' in window)) {
+      setNotifyFeedback('Notificações não são suportadas neste navegador.');
+      setTimeout(() => setNotifyFeedback(null), 3000);
+      return;
+    }
+
+    try {
+      const permission = await Notification.requestPermission();
+      if (permission === 'granted') {
+        setNotificationEnabled(true);
+        setNotifyFeedback('Lembrete diário ativado com sucesso!');
+        new Notification('Lumina Tarot • Conselho Sagrado', {
+          body: 'Seu lembrete oracular matinal está pronto para despertar sua clareza todos os dias.',
+          icon: './icon.svg'
+        });
+      } else {
+        setNotificationEnabled(false);
+        setNotifyFeedback('Permissão para notificações foi recusada.');
+      }
+      setTimeout(() => setNotifyFeedback(null), 3500);
+    } catch (e) {
+      console.error(e);
+    }
   };
 
   // Deterministic Daily Seed calculation & Daily Streak tracking
@@ -175,11 +210,36 @@ export const DailyCardModal = ({
           </div>
         </div>
 
-        {/* Footer Affirmation */}
-        <div className="mt-6 pt-4 border-t border-amber-500/20 flex flex-col sm:flex-row items-center justify-between gap-3">
-          <span className="text-xs text-slate-400 italic">
-            "Que a luz deste arcano inspire clareza em suas decisões hoje."
-          </span>
+        {/* Notification Feedback Message */}
+        {notifyFeedback && (
+          <div className="mt-3 p-2 rounded-xl bg-amber-500/20 border border-amber-400/50 text-amber-200 text-xs text-center font-cinzel animate-fade-in">
+            {notifyFeedback}
+          </div>
+        )}
+
+        {/* Footer Affirmation & Actions */}
+        <div className="mt-5 pt-4 border-t border-amber-500/20 flex flex-col sm:flex-row items-center justify-between gap-3">
+          <button
+            type="button"
+            onClick={handleToggleNotifications}
+            className={`px-3 py-1.5 rounded-xl border text-xs font-cinzel flex items-center gap-1.5 transition-all cursor-pointer ${
+              notificationEnabled 
+                ? 'bg-emerald-950/80 border-emerald-400/60 text-emerald-300' 
+                : 'bg-purple-950/70 hover:bg-purple-900 border-purple-500/40 text-purple-200 hover:text-amber-200'
+            }`}
+          >
+            {notificationEnabled ? (
+              <>
+                <Check className="w-3.5 h-3.5 text-emerald-400" />
+                <span>Lembrete Diário Ativado</span>
+              </>
+            ) : (
+              <>
+                <Bell className="w-3.5 h-3.5 text-amber-400" />
+                <span>Lembrar do Conselho Diário</span>
+              </>
+            )}
+          </button>
 
           <button
             type="button"

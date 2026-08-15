@@ -6,13 +6,12 @@ import { CardDetailModal } from './CardDetailModal';
 import { 
   X, Sparkles, BookOpen, Share2, Copy, Bookmark,
   RotateCcw, Check, Flame, Droplets, Wind, Mountain, 
-  Feather, Shield, Sun, Star, ZoomIn, Eye, Download, Image as ImageIcon
+  Feather, Shield, Sun, Star, ZoomIn, Eye
 } from 'lucide-react';
 import { SUITS } from '../data/tarotDeck';
 import { audio } from '../utils/audio';
 import { historyService } from '../utils/history';
 import { aiOracleService } from '../utils/aiOracle';
-import { cardImageExportService } from '../utils/cardImageExport';
 
 export const InterpretationModal = ({ 
   spreadConfig, 
@@ -26,7 +25,6 @@ export const InterpretationModal = ({
   const [aiReading, setAiReading] = useState(null);
   const [isLoadingAi, setIsLoadingAi] = useState(true);
   const [selectedCardDetail, setSelectedCardDetail] = useState(null);
-  const [isExporting, setIsExporting] = useState(false);
   const [shareNotice, setShareNotice] = useState(false);
 
   // Compute elemental and arcana balance
@@ -68,9 +66,7 @@ export const InterpretationModal = ({
     loadInterpretation();
   }, [spreadConfig, chosenCards, userQuestion]);
 
-  // Copy full reading text to clipboard with authentic paper rustle sound
-  const handleCopyReading = () => {
-    audio.playPaperRustle();
+  const getReadingText = () => {
     const lines = [
       `🔮 LUMINA TAROT - LEITURA ORACULAR`,
       `Tiragem: ${spreadConfig.name}`,
@@ -86,42 +82,32 @@ export const InterpretationModal = ({
       aiReading?.text || 'Interpretação profunda revelada pelos arcanos.',
       `\nLumina Tarot • Sabedoria Ancestral & Arcanos do Destino`
     ];
+    return lines.filter(Boolean).join('\n');
+  };
 
-    navigator.clipboard.writeText(lines.filter(Boolean).join('\n'));
+  // Copy full reading text to clipboard with authentic paper rustle sound
+  const handleCopyReading = () => {
+    audio.playPaperRustle();
+    navigator.clipboard.writeText(getReadingText());
     setCopied(true);
     setTimeout(() => setCopied(false), 2500);
   };
 
-  const handleExportImage = async () => {
-    audio.playPaperRustle();
-    setIsExporting(true);
-    await cardImageExportService.downloadReadingImage({
-      spreadConfig,
-      chosenCards: chosenCards.map((c, i) => ({
-        ...c,
-        positionName: spreadConfig.positions?.[i]?.name || `Arcano ${i + 1}`
-      })),
-      userQuestion,
-      oracleSynthesis: aiReading
-    });
-    setIsExporting(false);
-  };
-
   const handleShareReading = async () => {
     audio.playSelect();
-    const res = await cardImageExportService.shareReadingNative({
-      spreadConfig,
-      chosenCards: chosenCards.map((c, i) => ({
-        ...c,
-        positionName: spreadConfig.positions?.[i]?.name || `Arcano ${i + 1}`
-      })),
-      userQuestion,
-      oracleSynthesis: aiReading
-    });
-    if (res?.method === 'clipboard') {
-      setShareNotice(true);
-      setTimeout(() => setShareNotice(false), 2500);
+    const text = getReadingText();
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: `Lumina Tarot - ${spreadConfig.name}`,
+          text: text
+        });
+        return;
+      } catch (e) {}
     }
+    navigator.clipboard.writeText(text);
+    setShareNotice(true);
+    setTimeout(() => setShareNotice(false), 2500);
   };
 
   const handleReset = () => {
@@ -402,17 +388,6 @@ export const InterpretationModal = ({
 
             <button
               type="button"
-              onClick={handleExportImage}
-              disabled={isExporting}
-              title="Baixar imagem em alta resolução para Instagram/Stories"
-              className="flex-1 sm:flex-initial px-3.5 py-2.5 rounded-xl bg-amber-950/60 hover:bg-amber-900/80 border border-amber-500/40 text-amber-200 text-xs font-semibold flex items-center justify-center gap-1.5 transition-all cursor-pointer shadow-md active:scale-95 disabled:opacity-50"
-            >
-              <Download className={`w-4 h-4 ${isExporting ? 'animate-bounce' : ''}`} />
-              <span>{isExporting ? 'Gerando...' : 'Baixar Imagem'}</span>
-            </button>
-
-            <button
-              type="button"
               onClick={handleShareReading}
               title="Compartilhar leitura no WhatsApp ou outros aplicativos"
               className="flex-1 sm:flex-initial px-3.5 py-2.5 rounded-xl bg-slate-900 hover:bg-purple-950/80 border border-purple-500/40 text-purple-200 hover:text-amber-200 text-xs font-semibold flex items-center justify-center gap-1.5 transition-all cursor-pointer shadow-md active:scale-95"
@@ -458,7 +433,10 @@ export const InterpretationModal = ({
 
             <button
               type="button"
-              onClick={onClose}
+              onClick={() => {
+                audio.playConcludeReading();
+                onClose();
+              }}
               className="flex-1 sm:flex-initial px-6 py-2.5 rounded-xl bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-500 hover:to-yellow-400 text-slate-950 font-cinzel font-bold text-xs cursor-pointer transition-all shadow-md active:scale-95"
             >
               Concluir Leitura
