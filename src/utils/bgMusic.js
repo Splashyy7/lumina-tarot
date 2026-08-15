@@ -1,4 +1,5 @@
 // Background Sanctuary Ambient Music Manager (HTML5 Audio for genuine soundtrack)
+import sanctuaryAudioUrl from '../assets/audio/sanctuary.mp3';
 
 class BackgroundMusicService {
   constructor() {
@@ -11,11 +12,21 @@ class BackgroundMusicService {
   init() {
     if (typeof window === 'undefined' || this.audio) return;
     
-    this.audio = new Audio('/audio/sanctuary.mp3');
+    // Uses Vite bundled asset URL which automatically respects GitHub Pages repo subpaths (e.g. /lumina-tarot/assets/...)
+    const audioSrc = sanctuaryAudioUrl || `${import.meta.env.BASE_URL || './'}audio/sanctuary.mp3`;
+    
+    this.audio = new Audio(audioSrc);
     this.audio.loop = true;
     this.audio.volume = this.volume;
-    this.audio.preload = 'metadata';
+    this.audio.preload = 'auto';
     this.isInitialized = true;
+
+    // Additional error listener to log helpful hints if any network issues arise
+    this.audio.addEventListener('error', (e) => {
+      console.warn('Sanctuary background music error event:', e);
+      this.isPlaying = false;
+      this.notify();
+    });
   }
 
   notify() {
@@ -31,14 +42,18 @@ class BackgroundMusicService {
     if (!this.audio) return;
 
     this.audio.volume = this.volume;
-    this.audio.play().then(() => {
-      this.isPlaying = true;
-      this.notify();
-    }).catch(err => {
-      console.warn('Auto-play blocked or audio load error:', err);
-      this.isPlaying = false;
-      this.notify();
-    });
+    const playPromise = this.audio.play();
+    
+    if (playPromise !== undefined) {
+      playPromise.then(() => {
+        this.isPlaying = true;
+        this.notify();
+      }).catch(err => {
+        console.warn('Audio play prevented or path 404:', err);
+        this.isPlaying = false;
+        this.notify();
+      });
+    }
   }
 
   pause() {
