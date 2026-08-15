@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { CardArt } from './CardArt';
 import { 
@@ -15,7 +15,13 @@ export const CardDetailModal = ({
 }) => {
   if (!card) return null;
 
-  const suitConfig = SUITS[card.suit.toUpperCase()] || SUITS.MAJOR;
+  const suitConfig = SUITS[card.suit?.toUpperCase()] || SUITS.MAJOR;
+
+  useEffect(() => {
+    if (card) {
+      audio.playCardElementalSound(card);
+    }
+  }, [card?.id]);
 
   const handleClose = () => {
     audio.playCloseModal();

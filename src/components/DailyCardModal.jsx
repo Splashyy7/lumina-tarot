@@ -10,7 +10,7 @@ import { audio } from '../utils/audio';
 
 export const DailyCardModal = ({ 
   isOpen, 
-  onClose,
+  onClose, 
   onOpenCardDetail 
 }) => {
   const [notificationEnabled, setNotificationEnabled] = useState(() => {
@@ -21,41 +21,7 @@ export const DailyCardModal = ({
   });
   const [notifyFeedback, setNotifyFeedback] = useState(null);
 
-  if (!isOpen) return null;
-
-  const handleClose = () => {
-    audio.playCloseModal();
-    onClose();
-  };
-
-  const handleToggleNotifications = async () => {
-    audio.playSelect();
-    if (!('Notification' in window)) {
-      setNotifyFeedback('Notificações não são suportadas neste navegador.');
-      setTimeout(() => setNotifyFeedback(null), 3000);
-      return;
-    }
-
-    try {
-      const permission = await Notification.requestPermission();
-      if (permission === 'granted') {
-        setNotificationEnabled(true);
-        setNotifyFeedback('Lembrete diário ativado com sucesso!');
-        new Notification('Lumina Tarot • Conselho Sagrado', {
-          body: 'Seu lembrete oracular matinal está pronto para despertar sua clareza todos os dias.',
-          icon: './icon.svg'
-        });
-      } else {
-        setNotificationEnabled(false);
-        setNotifyFeedback('Permissão para notificações foi recusada.');
-      }
-      setTimeout(() => setNotifyFeedback(null), 3500);
-    } catch (e) {
-      console.error(e);
-    }
-  };
-
-  // Deterministic Daily Seed calculation & Daily Streak tracking
+  // Deterministic Daily Seed calculation & Daily Streak tracking (Top-level Hook)
   const { dailyCard, streak } = useMemo(() => {
     const today = new Date();
     const dateStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
@@ -95,6 +61,40 @@ export const DailyCardModal = ({
 
     return { dailyCard: card, streak: currentStreak };
   }, []);
+
+  if (!isOpen) return null;
+
+  const handleClose = () => {
+    audio.playCloseModal();
+    onClose();
+  };
+
+  const handleToggleNotifications = async () => {
+    audio.playSelect();
+    if (!('Notification' in window)) {
+      setNotifyFeedback('Notificações não são suportadas neste navegador.');
+      setTimeout(() => setNotifyFeedback(null), 3000);
+      return;
+    }
+
+    try {
+      const permission = await Notification.requestPermission();
+      if (permission === 'granted') {
+        setNotificationEnabled(true);
+        setNotifyFeedback('Lembrete diário ativado com sucesso!');
+        new Notification('Lumina Tarot • Conselho Sagrado', {
+          body: 'Seu lembrete oracular matinal está pronto para despertar sua clareza todos os dias.',
+          icon: './icon.svg'
+        });
+      } else {
+        setNotificationEnabled(false);
+        setNotifyFeedback('Permissão para notificações foi recusada.');
+      }
+      setTimeout(() => setNotifyFeedback(null), 3500);
+    } catch (e) {
+      console.error(e);
+    }
+  };
 
   const todayFormatted = new Date().toLocaleDateString('pt-BR', {
     weekday: 'long',

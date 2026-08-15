@@ -6,6 +6,7 @@ class MysticAudioEngine {
     this.initialized = false;
     this.loadingNodes = null;
     this.lastCardHoverTime = 0;
+    this.audioBuffers = {};
     this.setupAutoUnlock();
   }
 
@@ -23,11 +24,71 @@ class MysticAudioEngine {
     return this.ctx;
   }
 
+  // Pre-decode real natural audio samples into memory
+  async preloadElementalAudio() {
+    if (typeof window === 'undefined') return;
+    this.init();
+    if (!this.ctx) return;
+
+    const files = {
+      water: '/audio/water.wav',
+      fire: '/audio/fire.wav',
+      wind: '/audio/wind.wav',
+      earth: '/audio/earth.wav',
+      spirit: '/audio/spirit.wav',
+    };
+
+    for (const [key, path] of Object.entries(files)) {
+      if (this.audioBuffers[key]) continue;
+      try {
+        const res = await fetch(path);
+        if (!res.ok) continue;
+        const arrayBuf = await res.arrayBuffer();
+        this.audioBuffers[key] = await this.ctx.decodeAudioData(arrayBuf);
+      } catch (e) {}
+    }
+  }
+
+  // Play real audio sample from memory buffer
+  playBuffer(name, volume = 0.5, maxDuration = 2.5) {
+    if (this.muted) return false;
+    this.init();
+    if (!this.ctx) return false;
+
+    const buffer = this.audioBuffers[name];
+    if (!buffer) {
+      this.preloadElementalAudio();
+      return false;
+    }
+
+    try {
+      const now = this.ctx.currentTime;
+      const source = this.ctx.createBufferSource();
+      const gain = this.ctx.createGain();
+
+      source.buffer = buffer;
+      gain.gain.setValueAtTime(0.001, now);
+      gain.gain.linearRampToValueAtTime(volume, now + 0.04);
+      gain.gain.setValueAtTime(volume, now + maxDuration - 0.3);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + maxDuration);
+
+      source.connect(gain);
+      gain.connect(this.ctx.destination);
+
+      source.start(now);
+      source.stop(now + maxDuration);
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
   // Automatic Audio Context Unlocker on first user interaction
   setupAutoUnlock() {
     if (typeof window === 'undefined') return;
     const unlock = () => {
       this.init();
+      this.preloadElementalAudio();
       if (this.ctx && this.ctx.state === 'suspended') {
         this.ctx.resume().then(() => {
           if (this.loadingNodes && this.loadingNodes.gainNode) {
@@ -879,6 +940,168 @@ class MysticAudioEngine {
         osc.stop(now + 2.0);
       });
     } catch (e) {}
+  }
+
+  // ==================== ELEMENTAL ACOUSTIC SYNTHESIS ====================
+
+  // 1. 💧 Água (Real Water Droplets Recording + Liquid Resonance)
+  playElementWater() {
+    if (this.muted) return;
+    if (this.playBuffer('water', 0.08, 1.8)) return;
+
+    this.init();
+    if (!this.ctx) return;
+
+    try {
+      const now = this.ctx.currentTime;
+      const dropOsc = this.ctx.createOscillator();
+      const dropGain = this.ctx.createGain();
+      dropOsc.type = 'sine';
+      dropOsc.frequency.setValueAtTime(1950, now);
+      dropOsc.frequency.exponentialRampToValueAtTime(620, now + 0.12);
+      dropGain.gain.setValueAtTime(0.012, now);
+      dropGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.16);
+      dropOsc.connect(dropGain);
+      dropGain.connect(this.ctx.destination);
+      dropOsc.start(now);
+      dropOsc.stop(now + 0.16);
+    } catch (e) {}
+  }
+
+  // 2. 🔥 Fogo (Real Crackling Campfire & Flame Whoosh)
+  playElementFire() {
+    if (this.muted) return;
+    if (this.playBuffer('fire', 0.07, 2.0)) return;
+
+    this.init();
+    if (!this.ctx) return;
+
+    try {
+      const now = this.ctx.currentTime;
+      const flameOsc = this.ctx.createOscillator();
+      const flameGain = this.ctx.createGain();
+      flameOsc.type = 'triangle';
+      flameOsc.frequency.setValueAtTime(180, now);
+      flameOsc.frequency.exponentialRampToValueAtTime(320, now + 0.15);
+      flameOsc.frequency.exponentialRampToValueAtTime(120, now + 0.4);
+      flameGain.gain.setValueAtTime(0.001, now);
+      flameGain.gain.linearRampToValueAtTime(0.01, now + 0.08);
+      flameGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.45);
+      flameOsc.connect(flameGain);
+      flameGain.connect(this.ctx.destination);
+      flameOsc.start(now);
+      flameOsc.stop(now + 0.45);
+    } catch (e) {}
+  }
+
+  // 3. 🌪️ Ar (Real Howling Wind Breeze Recording)
+  playElementAir() {
+    if (this.muted) return;
+    if (this.playBuffer('wind', 0.06, 1.8)) return;
+
+    this.init();
+    if (!this.ctx) return;
+
+    try {
+      const now = this.ctx.currentTime;
+      const whistle = this.ctx.createOscillator();
+      const whistleGain = this.ctx.createGain();
+      whistle.type = 'sine';
+      whistle.frequency.setValueAtTime(1174.66, now);
+      whistle.frequency.exponentialRampToValueAtTime(1318.51, now + 0.25);
+      whistle.frequency.exponentialRampToValueAtTime(1046.50, now + 0.48);
+      whistleGain.gain.setValueAtTime(0.008, now);
+      whistleGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.5);
+      whistle.connect(whistleGain);
+      whistleGain.connect(this.ctx.destination);
+      whistle.start(now);
+      whistle.stop(now + 0.5);
+    } catch (e) {}
+  }
+
+  // 4. 🌿 Terra / Grama (Real Terrain / Grass Rustle Recording)
+  playElementEarth() {
+    if (this.muted) return;
+    if (this.playBuffer('earth', 0.07, 1.8)) return;
+
+    this.init();
+    if (!this.ctx) return;
+
+    try {
+      const now = this.ctx.currentTime;
+      const earthOsc = this.ctx.createOscillator();
+      const earthGain = this.ctx.createGain();
+      earthOsc.type = 'triangle';
+      earthOsc.frequency.setValueAtTime(196.0, now);
+      earthOsc.frequency.exponentialRampToValueAtTime(98.0, now + 0.3);
+      earthGain.gain.setValueAtTime(0.008, now);
+      earthGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.38);
+      earthOsc.connect(earthGain);
+      earthGain.connect(this.ctx.destination);
+      earthOsc.start(now);
+      earthOsc.stop(now + 0.38);
+    } catch (e) {}
+  }
+
+  // 5. ✨ Éter / Destino / Espírito (Real Sacred Bells Recording & Singing Bowls)
+  playElementSpirit() {
+    if (this.muted) return;
+    if (this.playBuffer('spirit', 0.07, 2.2)) return;
+
+    this.init();
+    if (!this.ctx) return;
+
+    try {
+      const now = this.ctx.currentTime;
+      const freqs = [432.0, 648.0, 864.0, 1296.0];
+      freqs.forEach((freq, idx) => {
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = idx % 2 === 0 ? 'sine' : 'triangle';
+        osc.frequency.setValueAtTime(freq, now + idx * 0.03);
+        gain.gain.setValueAtTime(0.008 / (idx + 1), now + idx * 0.03);
+        gain.gain.exponentialRampToValueAtTime(0.0001, now + 1.6);
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start(now + idx * 0.03);
+        osc.stop(now + 1.6);
+      });
+    } catch (e) {}
+  }
+
+  // Master Intelligent Elemental Sound Dispatcher
+  playCardElementalSound(card) {
+    if (!card) return;
+
+    const suit = (card.suit || '').toLowerCase();
+    const elem = (card.element || '').toLowerCase();
+
+    // 1. Water Detection (Cups / Copas / Água)
+    if (suit === 'cups' || elem.includes('água') || elem.includes('agua') || elem.includes('water')) {
+      this.playElementWater();
+      return;
+    }
+
+    // 2. Fire Detection (Wands / Paus / Fogo)
+    if (suit === 'wands' || elem.includes('fogo') || elem.includes('fire')) {
+      this.playElementFire();
+      return;
+    }
+
+    // 3. Air Detection (Swords / Espadas / Ar)
+    if (suit === 'swords' || elem.includes('ar') || elem.includes('air') || elem.includes('vento')) {
+      this.playElementAir();
+      return;
+    }
+
+    // 4. Earth Detection (Pentacles / Ouros / Terra / Grama)
+    if (suit === 'pentacles' || elem.includes('terra') || elem.includes('earth') || elem.includes('grama')) {
+      this.playElementEarth();
+      return;
+    }
+
+    // 5. Spirit / Major Arcana / Éter
+    this.playElementSpirit();
   }
 }
 
