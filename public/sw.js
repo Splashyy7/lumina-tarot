@@ -1,5 +1,5 @@
-// Lumina Tarot Service Worker (Offline Cache & Shell)
-const CACHE_NAME = 'lumina-tarot-v2.0';
+// Lumina Tarot Service Worker (Resilient Offline Cache & Network-First HTML Shell)
+const CACHE_NAME = 'lumina-tarot-v2.5';
 
 const OFFLINE_ASSETS = [
   './',
@@ -36,32 +36,47 @@ self.addEventListener('activate', (event) => {
 });
 
 self.addEventListener('fetch', (event) => {
-  // Only handle GET requests and skip external API / worker requests from caching
-  if (event.request.method !== 'GET' || event.request.url.includes('workers.dev') || event.request.url.includes('googleapis.com')) {
+  if (event.request.method !== 'GET') return;
+  const url = event.request.url;
+
+  // Skip external APIs
+  if (url.includes('workers.dev') || url.includes('googleapis.com') || url.includes('gstatic.com')) {
     return;
   }
 
+  // Network-First for HTML navigation to prevent stale chunk hash mismatch on new deployments
+  if (event.request.mode === 'navigate' || url.endsWith('.html') || url.endsWith('/')) {
+    event.respondWith(
+      fetch(event.request)
+        .then((response) => {
+          if (response && response.status === 200) {
+            const clone = response.clone();
+            caches.open(CACHE_NAME).then((cache) => cache.put(event.request, clone));
+          }
+          return response;
+        })
+        .catch(() => caches.match(event.request).then((res) => res || caches.match('./index.html')))
+    );
+    return;
+  }
+
+  // Cache-first with network fallback for static hashed assets
   event.respondWith(
     caches.match(event.request).then((cached) => {
       if (cached) {
-        // Fetch background update
-        fetch(event.request).then((response) => {
-          if (response && response.status === 200) {
-            caches.open(CACHE_NAME).then((cache) => cache.put(event.request, response));
-          }
-        }).catch(() => {});
         return cached;
       }
       return fetch(event.request).then((response) => {
         if (!response || response.status !== 200 || response.type !== 'basic') {
           return response;
         }
-        const responseClone = response.clone();
-        caches.open(CACHE_NAME).then((cache) => {
-          cache.put(event.request, responseClone);
-        });
+        const clone = response.clone();
+        caches.open(CACHE_NAME).then((cache) => cache.put(event.request, clone));
         return response;
-      }).catch(() => caches.match('./index.html'));
+      }).catch(() => {
+        // If chunk failed to fetch and is not in cache, return 404 so lazyWithRetry triggers reload
+        return new Response('Asset not found', { status: 404, statusText: 'Not Found' });
+      });
     })
   );
 });

@@ -12,17 +12,41 @@ import { themeService } from '../utils/theme';
 import { bgMusicService } from '../utils/bgMusic';
 import { audio } from '../utils/audio';
 
-// Lazy-loaded Modals for near-instant initial page loads (Code Splitting)
-const CardDetailModal = React.lazy(() => import('./CardDetailModal').then(m => ({ default: m.CardDetailModal })));
-const InterpretationModal = React.lazy(() => import('./InterpretationModal').then(m => ({ default: m.InterpretationModal })));
-const GuideModal = React.lazy(() => import('./GuideModal').then(m => ({ default: m.GuideModal })));
-const GrimoireModal = React.lazy(() => import('./GrimoireModal').then(m => ({ default: m.GrimoireModal })));
-const ReadingHistoryModal = React.lazy(() => import('./ReadingHistoryModal').then(m => ({ default: m.ReadingHistoryModal })));
-const DailyCardModal = React.lazy(() => import('./DailyCardModal').then(m => ({ default: m.DailyCardModal })));
-const ThemeSelectorModal = React.lazy(() => import('./ThemeSelectorModal').then(m => ({ default: m.ThemeSelectorModal })));
-const YesNoOracleModal = React.lazy(() => import('./YesNoOracleModal').then(m => ({ default: m.YesNoOracleModal })));
-const DestinySummonAnimation = React.lazy(() => import('./DestinySummonAnimation').then(m => ({ default: m.DestinySummonAnimation })));
-const ConfirmSpreadChangeModal = React.lazy(() => import('./ConfirmSpreadChangeModal').then(m => ({ default: m.ConfirmSpreadChangeModal })));
+// Resilient Lazy Loader that automatically recovers from stale chunk hashes on new deployments
+const lazyWithRetry = (componentImport) =>
+  React.lazy(async () => {
+    const pageHasBeenRefreshed = typeof window !== 'undefined' 
+      ? JSON.parse(window.sessionStorage.getItem('lumina_chunk_recovered') || 'false')
+      : false;
+
+    try {
+      const component = await componentImport();
+      if (typeof window !== 'undefined') {
+        window.sessionStorage.setItem('lumina_chunk_recovered', 'false');
+      }
+      return component;
+    } catch (error) {
+      if (!pageHasBeenRefreshed && typeof window !== 'undefined') {
+        // Chunk hash mismatch on new GitHub Pages deployment -> Auto-refresh to load new assets
+        window.sessionStorage.setItem('lumina_chunk_recovered', 'true');
+        window.location.reload();
+        return new Promise(() => {}); // Wait for page refresh
+      }
+      throw error;
+    }
+  });
+
+// Lazy-loaded Modals with Auto-Recovery
+const CardDetailModal = lazyWithRetry(() => import('./CardDetailModal').then(m => ({ default: m.CardDetailModal })));
+const InterpretationModal = lazyWithRetry(() => import('./InterpretationModal').then(m => ({ default: m.InterpretationModal })));
+const GuideModal = lazyWithRetry(() => import('./GuideModal').then(m => ({ default: m.GuideModal })));
+const GrimoireModal = lazyWithRetry(() => import('./GrimoireModal').then(m => ({ default: m.GrimoireModal })));
+const ReadingHistoryModal = lazyWithRetry(() => import('./ReadingHistoryModal').then(m => ({ default: m.ReadingHistoryModal })));
+const DailyCardModal = lazyWithRetry(() => import('./DailyCardModal').then(m => ({ default: m.DailyCardModal })));
+const ThemeSelectorModal = lazyWithRetry(() => import('./ThemeSelectorModal').then(m => ({ default: m.ThemeSelectorModal })));
+const YesNoOracleModal = lazyWithRetry(() => import('./YesNoOracleModal').then(m => ({ default: m.YesNoOracleModal })));
+const DestinySummonAnimation = lazyWithRetry(() => import('./DestinySummonAnimation').then(m => ({ default: m.DestinySummonAnimation })));
+const ConfirmSpreadChangeModal = lazyWithRetry(() => import('./ConfirmSpreadChangeModal').then(m => ({ default: m.ConfirmSpreadChangeModal })));
 
 // Fisher-Yates Deck Shuffle Utility
 const shuffleArray = (array) => {
