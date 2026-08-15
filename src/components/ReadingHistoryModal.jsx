@@ -199,6 +199,31 @@ export const ReadingHistoryModal = ({
                     ))}
                   </div>
 
+                  {/* Saved Oracle Synthesis & AI Response */}
+                  {(reading.aiReading || reading.oracleSynthesis) && (
+                    <div className="mt-3 p-3 sm:p-4 rounded-xl bg-purple-950/40 border border-amber-500/30 text-left">
+                      <div className="flex items-center gap-1.5 text-amber-300 font-cinzel text-xs font-bold mb-2">
+                        <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+                        <span>Revelação do Oráculo:</span>
+                      </div>
+
+                      {reading.aiReading?.diagnosis ? (
+                        <div className="space-y-2 text-xs text-slate-200 leading-relaxed font-sans">
+                          <p><strong className="text-amber-300 font-cinzel text-[11px] block">🌌 Diagnóstico:</strong> {reading.aiReading.diagnosis}</p>
+                          <p><strong className="text-amber-300 font-cinzel text-[11px] block">🔮 Forças Ocultas:</strong> {reading.aiReading.dynamics}</p>
+                          <p className="p-2 rounded-lg bg-slate-900/80 border border-purple-500/20 text-amber-100 italic">
+                            <strong className="text-amber-300 font-cinzel text-[11px] not-italic block mb-0.5">🗝️ Conselho Sagrado:</strong>
+                            "{reading.aiReading.advice}"
+                          </p>
+                        </div>
+                      ) : (
+                        <p className="text-xs text-slate-200 leading-relaxed whitespace-pre-line font-sans">
+                          {reading.oracleSynthesis || reading.aiReading?.text}
+                        </p>
+                      )}
+                    </div>
+                  )}
+
                   {/* Notes Section */}
                   <div className="mt-3 pt-3 border-t border-purple-900/30 flex flex-col gap-1.5">
                     <div className="flex items-center justify-between">

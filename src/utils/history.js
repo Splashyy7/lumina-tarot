@@ -44,6 +44,8 @@ export const historyService = {
           positionName: reading.spreadConfig.positions[idx]?.name || `Slot ${idx + 1}`,
           positionSubtitle: reading.spreadConfig.positions[idx]?.subtitle || ''
         })),
+        aiReading: reading.aiReading || null,
+        oracleSynthesis: reading.aiReading?.text || reading.oracleSynthesis || '',
         notes: reading.notes || ''
       };
 
