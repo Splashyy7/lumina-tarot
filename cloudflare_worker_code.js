@@ -57,23 +57,22 @@ ${cardsText}
 DIRETRIZES FUNDAMENTAIS:
 1. Responda em Português com tom oracular refinado, maduro e acolhedor (como um sábio mestre de tarot).
 2. NÃO use frases prontas e NÃO faça listas mecânicas de nomes. Conecte de verdade o simbolismo arquetípico com a dúvida específica do consulente.
-3. Estruture a resposta EXATAMENTE nestas 3 seções:
+3. Garanta que TODAS as 3 seções sejam integralmente finalizadas sem cortes, estruturadas EXATAMENTE assim:
 
 ### 🌌 O Diagnóstico da Intenção
-(Responda diretamente à dúvida do consulente e ao momento presente em 1 parágrafo profundo)
+(Responda diretamente à dúvida do consulente e ao momento presente em 1 parágrafo profundo de 80 a 120 palavras)
 
 ### 🔮 A Dinâmica das Forças Ocultas
-(Explique como os arcanos dialogam entre si, as tensões e os potenciais em jogo em 1 parágrafo)
+(Explique como os arcanos dialogam entre si, as tensões e os potenciais em jogo em 1 parágrafo profundo de 80 a 120 palavras)
 
 ### 🗝️ O Conselho Sagrado do Oráculo
-(Um conselho oracular claro, inspirador e transformador em 1 parágrafo)`;
+(Um conselho oracular claro, inspirador e transformador em 1 parágrafo de 80 a 120 palavras)`;
 
-      // Modelos ativos verificados da sua conta no Google
+      // Modelos ativos verificados na conta
       const modelsToTry = [
         "gemini-flash-latest",
         "gemini-flash-lite-latest",
         "gemini-2.5-flash-lite",
-        "gemini-3-flash-preview",
         "gemini-pro-latest"
       ];
 
@@ -97,7 +96,7 @@ DIRETRIZES FUNDAMENTAIS:
               ],
               generationConfig: {
                 temperature: 0.8,
-                maxOutputTokens: 1000
+                maxOutputTokens: 3000 // Limite ampliado para nunca cortar a resposta no meio
               }
             })
           });
