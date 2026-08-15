@@ -1,65 +1,155 @@
-// Background Sanctuary Ambient Music Manager (HTML5 Audio for genuine soundtrack)
+// Bulletproof Sanctuary Ambient Music Manager (Dual-Engine: HTML5 Audio + Web Audio Fallback for GitHub Pages)
 import sanctuaryAudioUrl from '../assets/audio/sanctuary.mp3';
 
 class BackgroundMusicService {
   constructor() {
     this.audio = null;
     this.isPlaying = false;
-    this.volume = 0.15; // Set low and gentle by default (15% volume)
+    this.isLoading = false;
+    this.volume = 0.15; // Set low and gentle (15% volume)
     this.isInitialized = false;
+    this.webAudioCtx = null;
+    this.webAudioSource = null;
+    this.webAudioGain = null;
+    this.audioBuffer = null;
+    this.setupAutoUnlock();
+  }
+
+  // Pre-unlock audio permission on first interaction
+  setupAutoUnlock() {
+    if (typeof window === 'undefined') return;
+    const unlock = () => {
+      this.init();
+      ['pointerdown', 'touchstart', 'click'].forEach(evt => {
+        window.removeEventListener(evt, unlock);
+      });
+    };
+    ['pointerdown', 'touchstart', 'click'].forEach(evt => {
+      window.addEventListener(evt, unlock, { once: true, passive: true });
+    });
+  }
+
+  getResolvedUrl() {
+    if (sanctuaryAudioUrl) return sanctuaryAudioUrl;
+    
+    // Fallback URL calculations for GitHub Pages repo subdirectories
+    const base = import.meta.env.BASE_URL || './';
+    const cleanBase = base.endsWith('/') ? base : `${base}/`;
+    return `${cleanBase}audio/sanctuary.mp3`;
   }
 
   init() {
-    if (typeof window === 'undefined' || this.audio) return;
+    if (typeof window === 'undefined' || this.isInitialized) return;
     
-    // Uses Vite bundled asset URL which automatically respects GitHub Pages repo subpaths (e.g. /lumina-tarot/assets/...)
-    const audioSrc = sanctuaryAudioUrl || `${import.meta.env.BASE_URL || './'}audio/sanctuary.mp3`;
-    
-    this.audio = new Audio(audioSrc);
-    this.audio.loop = true;
-    this.audio.volume = this.volume;
-    this.audio.preload = 'auto';
-    this.isInitialized = true;
-
-    // Additional error listener to log helpful hints if any network issues arise
-    this.audio.addEventListener('error', (e) => {
-      console.warn('Sanctuary background music error event:', e);
-      this.isPlaying = false;
-      this.notify();
-    });
+    const audioSrc = this.getResolvedUrl();
+    try {
+      this.audio = new Audio();
+      this.audio.crossOrigin = 'anonymous';
+      this.audio.src = audioSrc;
+      this.audio.loop = true;
+      this.audio.volume = this.volume;
+      this.audio.preload = 'auto';
+      this.isInitialized = true;
+    } catch (e) {
+      console.warn('HTML5 Audio init fallback to Web Audio', e);
+    }
   }
 
   notify() {
     if (typeof window !== 'undefined') {
       window.dispatchEvent(new CustomEvent('lumina_bg_music_changed', {
-        detail: { isPlaying: this.isPlaying, volume: this.volume }
+        detail: { isPlaying: this.isPlaying, volume: this.volume, isLoading: this.isLoading }
       }));
     }
   }
 
-  play() {
-    this.init();
-    if (!this.audio) return;
+  async playWithWebAudio() {
+    try {
+      const AudioCtx = window.AudioContext || window.webkitAudioContext;
+      if (!this.webAudioCtx && AudioCtx) {
+        this.webAudioCtx = new AudioCtx();
+      }
+      if (this.webAudioCtx && this.webAudioCtx.state === 'suspended') {
+        await this.webAudioCtx.resume();
+      }
 
-    this.audio.volume = this.volume;
-    const playPromise = this.audio.play();
-    
-    if (playPromise !== undefined) {
-      playPromise.then(() => {
-        this.isPlaying = true;
-        this.notify();
-      }).catch(err => {
-        console.warn('Audio play prevented or path 404:', err);
-        this.isPlaying = false;
-        this.notify();
-      });
+      if (!this.audioBuffer) {
+        const audioSrc = this.getResolvedUrl();
+        const response = await fetch(audioSrc);
+        const arrayBuffer = await response.arrayBuffer();
+        this.audioBuffer = await this.webAudioCtx.decodeAudioData(arrayBuffer);
+      }
+
+      if (this.webAudioSource) {
+        try { this.webAudioSource.stop(); } catch (e) {}
+      }
+
+      this.webAudioSource = this.webAudioCtx.createBufferSource();
+      this.webAudioSource.buffer = this.audioBuffer;
+      this.webAudioSource.loop = true;
+
+      this.webAudioGain = this.webAudioCtx.createGain();
+      this.webAudioGain.gain.setValueAtTime(this.volume, this.webAudioCtx.currentTime);
+
+      this.webAudioSource.connect(this.webAudioGain);
+      this.webAudioGain.connect(this.webAudioCtx.destination);
+
+      this.webAudioSource.start(0);
+      this.isPlaying = true;
+      this.isLoading = false;
+      this.notify();
+      return true;
+    } catch (err) {
+      console.error('Web Audio fallback failed:', err);
+      this.isPlaying = false;
+      this.isLoading = false;
+      this.notify();
+      return false;
     }
   }
 
+  async play() {
+    this.init();
+    this.isLoading = true;
+    this.isPlaying = true; // Show active state immediately to avoid UI flickering
+    this.notify();
+
+    // Strategy 1: HTML5 Audio
+    if (this.audio) {
+      try {
+        this.audio.volume = this.volume;
+        await this.audio.play();
+        this.isPlaying = true;
+        this.isLoading = false;
+        this.notify();
+        return;
+      } catch (err) {
+        console.warn('HTML5 Audio play failed, falling back to Web Audio API buffer:', err);
+      }
+    }
+
+    // Strategy 2: Web Audio API (Guaranteed on GitHub Pages without HTTP 206 Range requirements)
+    await this.playWithWebAudio();
+  }
+
   pause() {
-    if (!this.audio) return;
-    this.audio.pause();
+    this.isLoading = false;
     this.isPlaying = false;
+
+    // Pause HTML5 Audio
+    if (this.audio) {
+      try { this.audio.pause(); } catch (e) {}
+    }
+
+    // Pause Web Audio API
+    if (this.webAudioSource) {
+      try {
+        this.webAudioSource.stop();
+        this.webAudioSource.disconnect();
+        this.webAudioSource = null;
+      } catch (e) {}
+    }
+
     this.notify();
   }
 
@@ -81,6 +171,9 @@ class BackgroundMusicService {
     this.volume = Math.max(0, Math.min(1, newVolume));
     if (this.audio) {
       this.audio.volume = this.volume;
+    }
+    if (this.webAudioGain && this.webAudioCtx) {
+      this.webAudioGain.gain.setValueAtTime(this.volume, this.webAudioCtx.currentTime);
     }
     this.notify();
   }
