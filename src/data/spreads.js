@@ -54,6 +54,86 @@ export const SPREAD_TYPES = [
     ]
   },
   {
+    id: 'love_spread',
+    name: 'Templo dos Enamorados (Amor & Vínculos)',
+    shortName: 'Amor & Relacionamento',
+    compactName: 'Amor',
+    cardCount: 4,
+    layoutType: 'love',
+    icon: 'Heart',
+    description: 'Clareza profunda sobre sentimentos, dinâmicas de casal, desafios e o destino afetivo.',
+    positions: [
+      {
+        index: 0,
+        name: 'Sua Energia & Sentimentos',
+        subtitle: 'O que você realmente sente e manifesta no vínculo',
+        icon: 'User',
+        color: '#EC4899'
+      },
+      {
+        index: 1,
+        name: 'A Energia do Outro',
+        subtitle: 'O que a outra pessoa sente e projeta na relação',
+        icon: 'Users',
+        color: '#A855F7'
+      },
+      {
+        index: 2,
+        name: 'Desafios & Dinâmica do Vínculo',
+        subtitle: 'O bloqueio central a ser compreendido e transformado',
+        icon: 'Shield',
+        color: '#F97316'
+      },
+      {
+        index: 3,
+        name: 'O Futuro & Conselho Afetivo',
+        subtitle: 'O potencial de união e a postura sagrada para o amor',
+        icon: 'Star',
+        color: '#38BDF8'
+      }
+    ]
+  },
+  {
+    id: 'career_spread',
+    name: 'Bússola do Alquimista (Carreira & Finanças)',
+    shortName: 'Carreira & Prosperidade',
+    compactName: 'Carreira',
+    cardCount: 4,
+    layoutType: 'career',
+    icon: 'Briefcase',
+    description: 'Orientação estratégica para vocação, projetos, investimentos e superação de crises financeiras.',
+    positions: [
+      {
+        index: 0,
+        name: 'Momento Profissional Atual',
+        subtitle: 'Seu ponto de partida e realidade material no agora',
+        icon: 'Compass',
+        color: '#F59E0B'
+      },
+      {
+        index: 1,
+        name: 'Oportunidades & Forças Ocultas',
+        subtitle: 'Os ventos a favor e portas prestes a se abrir',
+        icon: 'Sparkles',
+        color: '#10B981'
+      },
+      {
+        index: 2,
+        name: 'Riscos & Pontos de Cautela',
+        subtitle: 'Armadilhas materiais ou ilusões que exigem atenção',
+        icon: 'AlertTriangle',
+        color: '#EF4444'
+      },
+      {
+        index: 3,
+        name: 'Caminho de Maior Prosperidade',
+        subtitle: 'A ação correta para alcançar realização e colheita abundante',
+        icon: 'Award',
+        color: '#FBBF24'
+      }
+    ]
+  },
+  {
     id: 'situation_action_outcome',
     name: 'Situação, Ação & Desfecho',
     shortName: 'Decisão & Ação',

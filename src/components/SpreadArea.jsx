@@ -274,6 +274,58 @@ export const SpreadArea = ({
     );
   };
 
+  // 6. Love & Relationship Diamond Layout
+  const renderLoveLayout = () => {
+    return (
+      <div className="flex flex-col items-center gap-4 sm:gap-6 py-4 max-w-3xl mx-auto animate-fade-in">
+        {/* Top: Futuro / Destino Afetivo */}
+        <div className="flex flex-col items-center">
+          {renderSlot(3, 'md', false, true)}
+        </div>
+
+        {/* Middle: Você (Left) & O Outro (Right) */}
+        <div className="flex flex-wrap items-center justify-center gap-6 sm:gap-12">
+          {renderSlot(0, 'md', false, true)}
+          <div className="hidden sm:flex items-center text-pink-400">
+            <Sparkles className="w-5 h-5 animate-pulse text-pink-400" />
+          </div>
+          {renderSlot(1, 'md', false, true)}
+        </div>
+
+        {/* Bottom: Desafios & Dinâmica */}
+        <div className="flex flex-col items-center">
+          {renderSlot(2, 'md', false, true)}
+        </div>
+      </div>
+    );
+  };
+
+  // 7. Career & Prosperity Cross Layout
+  const renderCareerLayout = () => {
+    return (
+      <div className="flex flex-col items-center gap-4 sm:gap-6 py-4 max-w-3xl mx-auto animate-fade-in">
+        {/* Top: Caminho de Maior Prosperidade */}
+        <div className="flex flex-col items-center">
+          {renderSlot(3, 'md', false, true)}
+        </div>
+
+        {/* Middle: Momento Atual (Left) & Oportunidades (Right) */}
+        <div className="flex flex-wrap items-center justify-center gap-6 sm:gap-12">
+          {renderSlot(0, 'md', false, true)}
+          <div className="hidden sm:flex items-center text-amber-400">
+            <Compass className="w-5 h-5 animate-pulse text-amber-400" />
+          </div>
+          {renderSlot(1, 'md', false, true)}
+        </div>
+
+        {/* Bottom: Riscos & Cautela */}
+        <div className="flex flex-col items-center">
+          {renderSlot(2, 'md', false, true)}
+        </div>
+      </div>
+    );
+  };
+
   // Dispatch layout based on spreadConfig.layoutType
   const renderLayoutContent = () => {
     switch (spreadConfig.layoutType) {
@@ -285,6 +337,10 @@ export const SpreadArea = ({
         return renderTrinityLayout();
       case 'single':
         return renderSingleLayout();
+      case 'love':
+        return renderLoveLayout();
+      case 'career':
+        return renderCareerLayout();
       case 'timeline':
       default:
         return renderTimelineLayout();

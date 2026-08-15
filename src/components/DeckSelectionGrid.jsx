@@ -114,10 +114,16 @@ export const DeckSelectionGrid = ({
               <button
                 type="button"
                 onClick={handleRandomPick}
-                className="px-4 py-2 rounded-xl bg-gradient-to-r from-amber-600/80 to-amber-500/80 hover:from-amber-500 hover:to-amber-400 text-slate-950 text-xs font-cinzel font-bold flex items-center justify-center gap-2 transition-all shadow-md active:scale-95 border border-amber-300/40 cursor-pointer"
+                className="relative group px-4 sm:px-5 py-2 sm:py-2.5 rounded-xl bg-gradient-to-r from-amber-600 via-yellow-500 to-amber-600 hover:from-yellow-500 hover:to-amber-400 text-slate-950 text-xs sm:text-sm font-cinzel font-black flex items-center justify-center gap-2 transition-all shadow-[0_0_20px_rgba(251,191,36,0.45)] hover:shadow-[0_0_35px_rgba(251,191,36,0.8)] border border-amber-300/80 active:scale-95 cursor-pointer overflow-hidden animate-pulse"
               >
-                <Dices className="w-4 h-4 text-slate-950 shrink-0" />
+                {/* Shimmer Light Reflection Sweep on Hover */}
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/35 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 pointer-events-none" />
+                
+                <Sparkles className="w-4 h-4 text-slate-950 animate-spin" style={{ animationDuration: '4s' }} />
                 <span>Escolha Guiada pelo Destino</span>
+                <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-slate-950/90 text-amber-300 font-sans font-bold">
+                  {remainingToPick}
+                </span>
               </button>
             )}
           </div>

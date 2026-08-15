@@ -2,7 +2,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { audio } from '../utils/audio';
 
-export const CardBack = ({ card, onClick, isSelected = false, index }) => {
+export const CardBack = React.memo(({ card, onClick, isSelected = false, index }) => {
   const handleMouseEnter = () => {
     if (!isSelected) {
       audio.playHover();
@@ -105,4 +105,4 @@ export const CardBack = ({ card, onClick, isSelected = false, index }) => {
       </div>
     </motion.div>
   );
-};
+});

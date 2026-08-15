@@ -1,7 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { SPREAD_TYPES } from '../data/spreads';
-import { Layers, Sparkles, Compass, HeartHandshake, PlusCircle } from 'lucide-react';
+import { Layers, Sparkles, Compass, HeartHandshake, PlusCircle, Heart, Briefcase } from 'lucide-react';
 import { audio } from '../utils/audio';
 
 const ICONS_MAP = {
@@ -10,6 +10,8 @@ const ICONS_MAP = {
   Compass,
   HeartHandshake,
   PlusCircle,
+  Heart,
+  Briefcase,
 };
 
 export const SpreadSelector = ({ 

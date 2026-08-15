@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { TAROT_DECK } from '../data/tarotDeck';
 import { SPREAD_TYPES } from '../data/spreads';
 import { Header } from './Header';
@@ -8,8 +8,18 @@ import { DeckSelectionGrid } from './DeckSelectionGrid';
 import { CardDetailModal } from './CardDetailModal';
 import { InterpretationModal } from './InterpretationModal';
 import { GuideModal } from './GuideModal';
+import { GrimoireModal } from './GrimoireModal';
+import { ReadingHistoryModal } from './ReadingHistoryModal';
+import { DailyCardModal } from './DailyCardModal';
+import { ThemeSelectorModal } from './ThemeSelectorModal';
+import { YesNoOracleModal } from './YesNoOracleModal';
+import { DestinySummonAnimation } from './DestinySummonAnimation';
 import { ConfirmSpreadChangeModal } from './ConfirmSpreadChangeModal';
+import { MobileBottomDock } from './MobileBottomDock';
 import { BackgroundStars } from './BackgroundStars';
+import { historyService } from '../utils/history';
+import { themeService } from '../utils/theme';
+import { bgMusicService } from '../utils/bgMusic';
 import { audio } from '../utils/audio';
 
 // Fisher-Yates Deck Shuffle Utility
@@ -23,31 +33,57 @@ const shuffleArray = (array) => {
 };
 
 export const TarotTable = () => {
-  // 1. Deck state (78 cards with estaEscolhida boolean)
+  const altarRef = useRef(null);
+
+  // 1. Theme state (Noite Cósmica, Luar Místico, Alquimia Solar, Veludo Carmesim)
+  const [currentTheme, setCurrentTheme] = useState(() => themeService.getCurrentTheme());
+
+  // 2. Deck state (78 cards with estaEscolhida boolean)
   const [deck, setDeck] = useState(() => {
     const initialDeck = TAROT_DECK.map(card => ({
       ...card,
       estaEscolhida: false,
+      isReversed: false,
     }));
     return shuffleArray(initialDeck);
   });
 
-  // 2. Active spread type (Default: 3 cards - Passado, Presente & Futuro)
+  // 3. Active spread type (Default: 3 cards - Passado, Presente & Futuro)
   const [activeSpread, setActiveSpread] = useState(SPREAD_TYPES[0]);
 
-  // 3. Chosen cards in spread slots (Array matching spread length)
+  // 4. Chosen cards in spread slots (Array matching spread length)
   const [chosenCards, setChosenCards] = useState(() => 
     new Array(SPREAD_TYPES[0].positions.length).fill(null)
   );
 
-  // 4. Question / Intent state
+  // 5. Question / Intent state
   const [userQuestion, setUserQuestion] = useState('');
 
-  // 5. Modal states
+  // 6. Reversed cards mode toggle (Default: false)
+  const [allowReversed, setAllowReversed] = useState(false);
+
+  // 7. Modal & Animation states
   const [inspectingCardData, setInspectingCardData] = useState(null);
   const [isInterpretationOpen, setIsInterpretationOpen] = useState(false);
   const [isGuideOpen, setIsGuideOpen] = useState(false);
+  const [isGrimoireOpen, setIsGrimoireOpen] = useState(false);
+  const [isHistoryOpen, setIsHistoryOpen] = useState(false);
+  const [isDailyOpen, setIsDailyOpen] = useState(false);
+  const [isThemesOpen, setIsThemesOpen] = useState(false);
+  const [isYesNoOpen, setIsYesNoOpen] = useState(false);
+  const [isZenMode, setIsZenMode] = useState(false);
+  const [destinySummonData, setDestinySummonData] = useState(null);
   const [pendingSpreadChange, setPendingSpreadChange] = useState(null);
+  const [historyCount, setHistoryCount] = useState(() => historyService.getReadings().length);
+
+  const refreshHistoryCount = useCallback(() => {
+    setHistoryCount(historyService.getReadings().length);
+  }, []);
+
+  const handleSelectTheme = useCallback((theme) => {
+    themeService.setThemeId(theme.id);
+    setCurrentTheme(theme);
+  }, []);
 
   // Remaining cards to pick for current spread
   const filledCount = chosenCards.filter(Boolean).length;
@@ -64,6 +100,7 @@ export const TarotTable = () => {
         return {
           ...card,
           estaEscolhida: alreadyChosen,
+          isReversed: false,
         };
       });
       return shuffleArray(refreshed);
@@ -73,7 +110,7 @@ export const TarotTable = () => {
   // Reset entire spread and restore deck
   const handleResetSpread = useCallback(() => {
     setChosenCards(new Array(activeSpread.positions.length).fill(null));
-    setDeck(prevDeck => prevDeck.map(card => ({ ...card, estaEscolhida: false })));
+    setDeck(prevDeck => prevDeck.map(card => ({ ...card, estaEscolhida: false, isReversed: false })));
   }, [activeSpread]);
 
   // Spread Change Request Handler (Checks if table has cards to show custom overlay)
@@ -85,7 +122,7 @@ export const TarotTable = () => {
     } else {
       setActiveSpread(newSpread);
       setChosenCards(new Array(newSpread.positions.length).fill(null));
-      setDeck(prevDeck => prevDeck.map(card => ({ ...card, estaEscolhida: false })));
+      setDeck(prevDeck => prevDeck.map(card => ({ ...card, estaEscolhida: false, isReversed: false })));
     }
   }, [activeSpread, filledCount]);
 
@@ -94,11 +131,11 @@ export const TarotTable = () => {
     if (!pendingSpreadChange) return;
     setActiveSpread(pendingSpreadChange);
     setChosenCards(new Array(pendingSpreadChange.positions.length).fill(null));
-    setDeck(prevDeck => prevDeck.map(card => ({ ...card, estaEscolhida: false })));
+    setDeck(prevDeck => prevDeck.map(card => ({ ...card, estaEscolhida: false, isReversed: false })));
     setPendingSpreadChange(null);
   }, [pendingSpreadChange]);
 
-  // Card Selection Handler (Click from Grid)
+  // Single Card Selection Handler (Click from Grid)
   const handleSelectCard = useCallback((card) => {
     if (!canSelectMore || card.estaEscolhida) return;
 
@@ -106,18 +143,20 @@ export const TarotTable = () => {
     const nextSlotIndex = chosenCards.findIndex(c => c === null);
     if (nextSlotIndex === -1) return;
 
+    const isCardReversed = allowReversed ? (Math.random() < 0.35) : false;
+
     // 2. Mark card as chosen in deck
     setDeck(prevDeck => 
-      prevDeck.map(c => c.id === card.id ? { ...c, estaEscolhida: true } : c)
+      prevDeck.map(c => c.id === card.id ? { ...c, estaEscolhida: true, isReversed: isCardReversed } : c)
     );
 
     // 3. Place card into chosen spread slot
     setChosenCards(prevChosen => {
       const updated = [...prevChosen];
-      updated[nextSlotIndex] = { ...card, estaEscolhida: true };
+      updated[nextSlotIndex] = { ...card, estaEscolhida: true, isReversed: isCardReversed };
       return updated;
     });
-  }, [canSelectMore, chosenCards]);
+  }, [allowReversed, canSelectMore, chosenCards]);
 
   // Remove Card from Spread Slot Handler
   const handleRemoveCard = useCallback((slotIndex) => {
@@ -126,7 +165,7 @@ export const TarotTable = () => {
 
     // Unmark in deck
     setDeck(prevDeck => 
-      prevDeck.map(c => c.id === cardToRemove.id ? { ...c, estaEscolhida: false } : c)
+      prevDeck.map(c => c.id === cardToRemove.id ? { ...c, estaEscolhida: false, isReversed: false } : c)
     );
 
     // Remove from spread
@@ -137,17 +176,48 @@ export const TarotTable = () => {
     });
   }, [chosenCards]);
 
-  // Random Pick (Escolha Guiada pelo Destino)
-  const handleRandomPick = useCallback(() => {
+  // Full Cinematic Destiny Draw (Tiragem Inteira Guiada pelo Destino com Estrela Cadente Genshin)
+  const handleFullDestinyDraw = useCallback(() => {
     if (!canSelectMore) return;
 
-    const availableCards = deck.filter(c => !c.estaEscolhida);
-    if (availableCards.length === 0) return;
+    const available = deck.filter(c => !c.estaEscolhida);
+    if (available.length === 0) return;
 
-    const randomIndex = Math.floor(Math.random() * availableCards.length);
-    const chosenOne = availableCards[randomIndex];
-    handleSelectCard(chosenOne);
-  }, [canSelectMore, deck, handleSelectCard]);
+    const shuffledAvailable = shuffleArray(available);
+    const pickedCards = shuffledAvailable.slice(0, remainingToPick).map(card => ({
+      ...card,
+      estaEscolhida: true,
+      isReversed: allowReversed ? (Math.random() < 0.35) : false
+    }));
+
+    setDestinySummonData(pickedCards);
+  }, [allowReversed, canSelectMore, deck, remainingToPick]);
+
+  // Complete Destiny Summon Sequence and place cards into altar slots
+  const handleDestinySummonComplete = useCallback((summonedCards) => {
+    setChosenCards(prevChosen => {
+      const updated = [...prevChosen];
+      let summonIdx = 0;
+      for (let i = 0; i < updated.length; i++) {
+        if (updated[i] === null && summonIdx < summonedCards.length) {
+          updated[i] = summonedCards[summonIdx];
+          summonIdx++;
+        }
+      }
+      return updated;
+    });
+
+    const summonedIds = new Set(summonedCards.map(c => c.id));
+    setDeck(prevDeck => prevDeck.map(c => {
+      if (summonedIds.has(c.id)) {
+        const found = summonedCards.find(sc => sc.id === c.id);
+        return { ...c, estaEscolhida: true, isReversed: found?.isReversed || false };
+      }
+      return c;
+    }));
+
+    setDestinySummonData(null);
+  }, []);
 
   // Inspect Card Details (Play dedicated mystical zoom sound)
   const handleInspectCard = useCallback((card, positionInfo) => {
@@ -155,58 +225,155 @@ export const TarotTable = () => {
     setInspectingCardData({ card, positionInfo });
   }, []);
 
+  const scrollToAltar = useCallback(() => {
+    if (altarRef.current) {
+      altarRef.current.scrollIntoView({ behavior: 'smooth' });
+    } else {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  }, []);
+
+  // Keyboard Shortcuts Listener
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      // Ignore if user is currently typing in an input
+      if (['INPUT', 'TEXTAREA'].includes(document.activeElement?.tagName)) return;
+
+      if (e.code === 'Space') {
+        e.preventDefault();
+        audio.playShuffle();
+        handleShuffleDeck();
+      } else if (e.key === 'd' || e.key === 'D') {
+        e.preventDefault();
+        handleFullDestinyDraw();
+      } else if (e.key === 'g' || e.key === 'G') {
+        e.preventDefault();
+        audio.playHover();
+        setIsGrimoireOpen(prev => !prev);
+      } else if (e.key === 'h' || e.key === 'H') {
+        e.preventDefault();
+        audio.playHover();
+        setIsHistoryOpen(prev => !prev);
+      } else if (e.key === 't' || e.key === 'T') {
+        e.preventDefault();
+        audio.playHover();
+        setIsThemesOpen(prev => !prev);
+      } else if (e.key === 'z' || e.key === 'Z') {
+        e.preventDefault();
+        setIsZenMode(prev => !prev);
+      } else if (e.key === 'm' || e.key === 'M') {
+        e.preventDefault();
+        bgMusicService.toggle();
+      } else if (e.key === 'Escape') {
+        setInspectingCardData(null);
+        setIsInterpretationOpen(false);
+        setIsGuideOpen(false);
+        setIsGrimoireOpen(false);
+        setIsHistoryOpen(false);
+        setIsDailyOpen(false);
+        setIsThemesOpen(false);
+        setIsYesNoOpen(false);
+        setPendingSpreadChange(null);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [handleFullDestinyDraw, handleShuffleDeck]);
+
   return (
-    <div className="relative min-h-screen flex flex-col bg-[#070A18] text-slate-100 selection:bg-amber-400/30 selection:text-amber-200">
-      {/* Background Animated Celestial Stars Canvas */}
-      <BackgroundStars />
+    <div 
+      className="relative min-h-screen flex flex-col text-slate-100 selection:bg-amber-400/30 selection:text-amber-200 transition-colors duration-700"
+      style={{ backgroundColor: currentTheme.bgColor }}
+    >
+      {/* Background Animated Celestial Stars Canvas matching active Theme */}
+      <BackgroundStars theme={currentTheme} />
 
       {/* Main Content Container */}
-      <main className="relative z-10 flex-1 flex flex-col px-3 sm:px-6 lg:px-8 max-w-7xl mx-auto w-full pb-20">
+      <main className="relative z-10 flex-1 flex flex-col px-3 sm:px-6 lg:px-8 max-w-7xl mx-auto w-full pb-28 md:pb-20">
         
-        {/* Header with Title & Question Input */}
+        {/* Header with Title, Features & Controls */}
         <Header
           userQuestion={userQuestion}
           setUserQuestion={setUserQuestion}
+          allowReversed={allowReversed}
+          setAllowReversed={setAllowReversed}
+          currentTheme={currentTheme}
+          onOpenThemes={() => setIsThemesOpen(true)}
           onOpenGuide={() => setIsGuideOpen(true)}
+          onOpenGrimoire={() => setIsGrimoireOpen(true)}
+          onOpenHistory={() => {
+            refreshHistoryCount();
+            setIsHistoryOpen(true);
+          }}
+          onOpenDaily={() => setIsDailyOpen(true)}
+          onOpenYesNo={() => setIsYesNoOpen(true)}
+          isZenMode={isZenMode}
+          onToggleZenMode={() => setIsZenMode(!isZenMode)}
+          historyCount={historyCount}
         />
 
-        {/* Spread Selector Navigation */}
-        <SpreadSelector
-          currentSpread={activeSpread}
-          onSelectSpread={handleSelectSpreadRequest}
-        />
+        {/* Spread Selector Navigation (Visible when not in Zen Mode) */}
+        {!isZenMode && (
+          <SpreadSelector
+            currentSpread={activeSpread}
+            onSelectSpread={handleSelectSpreadRequest}
+          />
+        )}
 
         {/* The Spread Reading Altar (Slots Area) */}
-        <SpreadArea
-          spreadConfig={activeSpread}
-          chosenCards={chosenCards}
-          onCardClick={handleInspectCard}
-          onRemoveCard={handleRemoveCard}
-          onOpenInterpretation={() => setIsInterpretationOpen(true)}
-          onResetSpread={handleResetSpread}
-        />
+        <div ref={altarRef}>
+          <SpreadArea
+            spreadConfig={activeSpread}
+            chosenCards={chosenCards}
+            onCardClick={handleInspectCard}
+            onRemoveCard={handleRemoveCard}
+            onOpenInterpretation={() => {
+              refreshHistoryCount();
+              setIsInterpretationOpen(true);
+            }}
+            onResetSpread={handleResetSpread}
+          />
+        </div>
 
-        {/* The 78-Card Deck Selection Grid */}
-        <DeckSelectionGrid
-          deck={deck}
-          onSelectCard={handleSelectCard}
-          onRandomPick={handleRandomPick}
-          onShuffleDeck={handleShuffleDeck}
-          canSelectMore={canSelectMore}
-          remainingToPick={remainingToPick}
-        />
+        {/* The 78-Card Deck Selection Grid (Visible when not in Zen Mode) */}
+        {!isZenMode && (
+          <DeckSelectionGrid
+            deck={deck}
+            onSelectCard={handleSelectCard}
+            onRandomPick={handleFullDestinyDraw}
+            onShuffleDeck={handleShuffleDeck}
+            canSelectMore={canSelectMore}
+            remainingToPick={remainingToPick}
+          />
+        )}
 
       </main>
 
       {/* Footer */}
-      <footer className="relative z-10 py-6 text-center text-xs text-slate-500 border-t border-purple-900/30 glass-panel-subtle mt-auto">
+      <footer className="relative z-10 py-6 text-center text-xs text-slate-500 border-t border-purple-900/30 glass-panel-subtle mt-auto hidden md:block">
         <p className="font-cinzel tracking-wider text-amber-200/60">
           Lumina Tarot • Sabedoria Ancestral & Arcanos do Destino
         </p>
         <p className="text-[11px] text-slate-600 mt-1">
-          Inspirado na arte e tradição do Tarot com 78 cartas clássicas.
+          Atalhos: [Espaço] Embaralhar • [D] Destino • [G] Grimório • [H] Diário • [T] Temas • [Z] Zen • [Esc] Fechar
         </p>
       </footer>
+
+      {/* Mobile Floating Bottom Dock */}
+      <MobileBottomDock
+        onScrollToAltar={scrollToAltar}
+        onOpenDestiny={handleFullDestinyDraw}
+        onOpenYesNo={() => setIsYesNoOpen(true)}
+        onOpenGrimoire={() => setIsGrimoireOpen(true)}
+        onOpenHistory={() => {
+          refreshHistoryCount();
+          setIsHistoryOpen(true);
+        }}
+        onOpenThemes={() => setIsThemesOpen(true)}
+        historyCount={historyCount}
+        currentTheme={currentTheme}
+      />
 
       {/* Single Card Inspector Modal */}
       {inspectingCardData && (
@@ -223,7 +390,10 @@ export const TarotTable = () => {
           spreadConfig={activeSpread}
           chosenCards={chosenCards.filter(Boolean)}
           userQuestion={userQuestion}
-          onClose={() => setIsInterpretationOpen(false)}
+          onClose={() => {
+            refreshHistoryCount();
+            setIsInterpretationOpen(false);
+          }}
           onResetReading={handleResetSpread}
         />
       )}
@@ -233,6 +403,55 @@ export const TarotTable = () => {
         isOpen={isGuideOpen}
         onClose={() => setIsGuideOpen(false)}
       />
+
+      {/* Grimoire Codex Modal (78 cards encyclopedia) */}
+      <GrimoireModal
+        isOpen={isGrimoireOpen}
+        onClose={() => setIsGrimoireOpen(false)}
+        onOpenCardDetail={(card) => setInspectingCardData({ card, positionInfo: null })}
+      />
+
+      {/* Reading Journal History Modal */}
+      <ReadingHistoryModal
+        isOpen={isHistoryOpen}
+        onClose={() => {
+          refreshHistoryCount();
+          setIsHistoryOpen(false);
+        }}
+        onOpenCardDetail={(card, pos) => setInspectingCardData({ card, positionInfo: pos })}
+      />
+
+      {/* Daily Card Modal */}
+      <DailyCardModal
+        isOpen={isDailyOpen}
+        onClose={() => setIsDailyOpen(false)}
+        onOpenCardDetail={(card) => setInspectingCardData({ card, positionInfo: null })}
+      />
+
+      {/* Sanctuary Altar Theme Selector Modal */}
+      <ThemeSelectorModal
+        isOpen={isThemesOpen}
+        currentTheme={currentTheme}
+        onSelectTheme={handleSelectTheme}
+        onClose={() => setIsThemesOpen(false)}
+      />
+
+      {/* Yes / No Oracle Direct Modal */}
+      <YesNoOracleModal
+        isOpen={isYesNoOpen}
+        allowReversed={allowReversed}
+        onClose={() => setIsYesNoOpen(false)}
+      />
+
+      {/* Full Cinematic Genshin-style Shooting Star Destiny Summon Animation Overlay */}
+      {destinySummonData && (
+        <DestinySummonAnimation
+          cardsToSummon={destinySummonData}
+          spreadConfig={activeSpread}
+          onComplete={handleDestinySummonComplete}
+          onCancel={() => setDestinySummonData(null)}
+        />
+      )}
 
       {/* Custom Mystical Confirm Spread Change Overlay Modal */}
       <ConfirmSpreadChangeModal

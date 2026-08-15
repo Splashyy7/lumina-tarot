@@ -616,6 +616,134 @@ class MysticAudioEngine {
       // Fallback
     }
   }
+
+  // ==================== GENSHIN-INSPIRED WISH & SHOOTING STAR SOUNDS ====================
+  
+  // 1. Shooting Star Launch & Flight Swoosh (Ascending Celestial Sweep)
+  playWishLaunch() {
+    if (this.muted) return;
+    this.init();
+    if (!this.ctx) return;
+
+    try {
+      const now = this.ctx.currentTime;
+
+      // Sweeping golden celestial oscillator
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      const filter = this.ctx.createBiquadFilter();
+
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(220, now);
+      osc.frequency.exponentialRampToValueAtTime(1320, now + 1.2);
+
+      filter.type = 'bandpass';
+      filter.frequency.setValueAtTime(300, now);
+      filter.frequency.exponentialRampToValueAtTime(2400, now + 1.2);
+      filter.Q.setValueAtTime(4, now);
+
+      gain.gain.setValueAtTime(0.001, now);
+      gain.gain.linearRampToValueAtTime(0.05, now + 0.4);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + 1.4);
+
+      osc.connect(filter);
+      filter.connect(gain);
+      gain.connect(this.ctx.destination);
+
+      osc.start(now);
+      osc.stop(now + 1.4);
+
+      // Trailing star dust high harmonics (Shimmer)
+      const shimmerNotes = [523.25, 659.25, 783.99, 1046.50, 1318.51];
+      shimmerNotes.forEach((freq, i) => {
+        const sOsc = this.ctx.createOscillator();
+        const sGain = this.ctx.createGain();
+        sOsc.type = 'sine';
+        sOsc.frequency.setValueAtTime(freq, now + i * 0.1);
+        sGain.gain.setValueAtTime(0.015, now + i * 0.1);
+        sGain.gain.exponentialRampToValueAtTime(0.0001, now + 1.2);
+
+        sOsc.connect(sGain);
+        sGain.connect(this.ctx.destination);
+        sOsc.start(now + i * 0.1);
+        sOsc.stop(now + 1.2);
+      });
+    } catch (e) {}
+  }
+
+  // 2. Starburst Impact Explosion (Warm Sub-Bass + Golden Cathedral Chimes)
+  playStarImpact() {
+    if (this.muted) return;
+    this.init();
+    if (!this.ctx) return;
+
+    try {
+      const now = this.ctx.currentTime;
+
+      // Deep celestial bass impact
+      const subOsc = this.ctx.createOscillator();
+      const subGain = this.ctx.createGain();
+      subOsc.type = 'sine';
+      subOsc.frequency.setValueAtTime(110, now);
+      subOsc.frequency.exponentialRampToValueAtTime(45, now + 0.6);
+
+      subGain.gain.setValueAtTime(0.12, now);
+      subGain.gain.exponentialRampToValueAtTime(0.0001, now + 1.5);
+
+      subOsc.connect(subGain);
+      subGain.connect(this.ctx.destination);
+      subOsc.start(now);
+      subOsc.stop(now + 1.5);
+
+      // Radiant 5-Star Chime Burst Chord (D Major 9th Celestial)
+      const chord = [293.66, 440.0, 587.33, 739.99, 880.0, 1174.66, 1760.0];
+      chord.forEach((freq, idx) => {
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        
+        osc.type = idx % 2 === 0 ? 'sine' : 'triangle';
+        osc.frequency.setValueAtTime(freq, now);
+        
+        gain.gain.setValueAtTime(0.04 / (idx + 1), now);
+        gain.gain.exponentialRampToValueAtTime(0.0001, now + 2.4);
+
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+
+        osc.start(now);
+        osc.stop(now + 2.4);
+      });
+    } catch (e) {}
+  }
+
+  // 3. Card Summon Cascade (Fluttering cards appearing from star dust)
+  playCardSummonCascade(count = 3) {
+    if (this.muted) return;
+    this.init();
+    if (!this.ctx) return;
+
+    try {
+      const now = this.ctx.currentTime;
+      for (let i = 0; i < count; i++) {
+        const time = now + i * 0.08;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(523.25 + i * 80, time);
+        osc.frequency.exponentialRampToValueAtTime(1046.50 + i * 120, time + 0.15);
+
+        gain.gain.setValueAtTime(0.03, time);
+        gain.gain.exponentialRampToValueAtTime(0.0001, time + 0.35);
+
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+
+        osc.start(time);
+        osc.stop(time + 0.35);
+      }
+    } catch (e) {}
+  }
 }
 
 export const audio = new MysticAudioEngine();

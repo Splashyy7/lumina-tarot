@@ -1,17 +1,42 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Sparkles, Volume2, VolumeX, HelpCircle, 
-  Moon, Sun, Compass, Heart, Feather 
+  Moon, Sun, Compass, BookOpen, RotateCw, 
+  Bookmark, Feather, Layers, Palette, 
+  Music, Maximize2, Minimize2 
 } from 'lucide-react';
 import { audio } from '../utils/audio';
+import { bgMusicService } from '../utils/bgMusic';
 
 export const Header = ({ 
   userQuestion, 
   setUserQuestion, 
-  onOpenGuide 
+  allowReversed,
+  setAllowReversed,
+  currentTheme,
+  onOpenThemes,
+  onOpenGuide,
+  onOpenGrimoire,
+  onOpenHistory,
+  onOpenDaily,
+  onOpenYesNo,
+  isZenMode,
+  onToggleZenMode,
+  historyCount = 0
 }) => {
   const [isMuted, setIsMuted] = useState(audio.isMuted());
+  const [isMusicPlaying, setIsMusicPlaying] = useState(() => bgMusicService.getIsPlaying());
   const [isFocused, setIsFocused] = useState(false);
+
+  useEffect(() => {
+    const handleMusicChange = (e) => {
+      if (e.detail) {
+        setIsMusicPlaying(e.detail.isPlaying);
+      }
+    };
+    window.addEventListener('lumina_bg_music_changed', handleMusicChange);
+    return () => window.removeEventListener('lumina_bg_music_changed', handleMusicChange);
+  }, []);
 
   const toggleSound = () => {
     const nextMute = !isMuted;
@@ -22,62 +47,196 @@ export const Header = ({
     }
   };
 
+  const toggleMusic = () => {
+    audio.playSelect();
+    const active = bgMusicService.toggle();
+    setIsMusicPlaying(active);
+  };
+
+  const toggleReversed = () => {
+    audio.playSelect();
+    setAllowReversed(!allowReversed);
+  };
+
   return (
-    <header className="relative w-full max-w-7xl mx-auto pt-6 pb-4 px-4 flex flex-col items-center text-center">
-      {/* Top Bar with Brand & Utilities */}
-      <div className="w-full flex items-center justify-between mb-4">
-        {/* Subtle Symbol */}
+    <header className={`relative w-full max-w-7xl mx-auto pt-4 sm:pt-6 pb-4 px-3 sm:px-4 flex flex-col items-center text-center transition-opacity duration-300 ${isZenMode ? 'opacity-20 hover:opacity-100' : 'opacity-100'}`}>
+      {/* Top Utility Bar */}
+      <div className="w-full flex flex-wrap items-center justify-between gap-2.5 mb-4">
+        {/* Left: Brand Tag */}
         <div className="flex items-center gap-2 text-amber-400/80">
-          <Moon className="w-4 h-4" />
-          <span className="text-[11px] font-cinzel tracking-widest text-amber-200/70 uppercase">
-            Oráculo Sagrado
+          <Moon className="w-4 h-4 text-purple-400" />
+          <span className="text-[11px] font-cinzel tracking-widest text-amber-200/80 uppercase font-semibold">
+            Santuário dos Arcanos
           </span>
-          <Sun className="w-4 h-4" />
+          <Sun className="w-4 h-4 text-amber-400" />
         </div>
 
-        {/* Action Controls */}
-        <div className="flex items-center gap-2">
+        {/* Right: Quick Features Buttons */}
+        <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
+          {/* Sim / Não Oracle Button */}
+          <button
+            type="button"
+            onClick={() => {
+              audio.playInspectZoom();
+              if (onOpenYesNo) onOpenYesNo();
+            }}
+            title="Oráculo do Sim ou Não"
+            className="px-2.5 py-1.5 rounded-xl bg-emerald-950/70 border border-emerald-500/40 hover:border-emerald-400 text-emerald-300 text-xs font-cinzel font-semibold flex items-center gap-1.5 transition-all cursor-pointer shadow-sm active:scale-95"
+          >
+            <HelpCircle className="w-3.5 h-3.5 text-emerald-400" />
+            <span className="hidden sm:inline">Sim ou Não</span>
+          </button>
+
+          {/* Daily Card Button */}
+          <button
+            type="button"
+            onClick={() => {
+              audio.playInspectZoom();
+              if (onOpenDaily) onOpenDaily();
+            }}
+            title="Carta do Dia - Oráculo Diário"
+            className="px-2.5 py-1.5 rounded-xl glass-panel-subtle hover:border-amber-400/60 text-amber-300 text-xs font-cinzel font-semibold flex items-center gap-1.5 transition-all cursor-pointer shadow-sm active:scale-95"
+          >
+            <Sun className="w-3.5 h-3.5 text-amber-400 animate-pulse" />
+            <span className="hidden sm:inline">Carta do Dia</span>
+          </button>
+
+          {/* Grimoire Codex Button */}
+          <button
+            type="button"
+            onClick={() => {
+              audio.playHover();
+              if (onOpenGrimoire) onOpenGrimoire();
+            }}
+            title="Grimório - Enciclopédia dos 78 Arcanos (Atalho: G)"
+            className="px-2.5 py-1.5 rounded-xl glass-panel-subtle hover:border-purple-400/60 text-purple-200 text-xs font-cinzel font-semibold flex items-center gap-1.5 transition-all cursor-pointer shadow-sm active:scale-95"
+          >
+            <BookOpen className="w-3.5 h-3.5 text-purple-400" />
+            <span className="hidden sm:inline">Grimório</span>
+          </button>
+
+          {/* Reading Journal History Button */}
+          <button
+            type="button"
+            onClick={() => {
+              audio.playHover();
+              if (onOpenHistory) onOpenHistory();
+            }}
+            title="Diário Oracular - Histórico de Leituras (Atalho: H)"
+            className="px-2.5 py-1.5 rounded-xl glass-panel-subtle hover:border-amber-400/60 text-slate-200 text-xs font-cinzel font-semibold flex items-center gap-1.5 transition-all cursor-pointer shadow-sm active:scale-95"
+          >
+            <Bookmark className="w-3.5 h-3.5 text-amber-400" />
+            <span className="hidden sm:inline">Diário</span>
+            {historyCount > 0 && (
+              <span className="px-1.5 py-0.2 rounded-full bg-amber-500 text-slate-950 text-[10px] font-bold font-sans leading-none">
+                {historyCount}
+              </span>
+            )}
+          </button>
+
+          {/* Themes Switcher Button */}
+          <button
+            type="button"
+            onClick={() => {
+              audio.playHover();
+              if (onOpenThemes) onOpenThemes();
+            }}
+            title={`Tema do Altar: ${currentTheme?.name || 'Padrão'} (Atalho: T)`}
+            className="px-2.5 py-1.5 rounded-xl glass-panel-subtle hover:border-amber-400/60 text-slate-200 text-xs font-cinzel font-semibold flex items-center gap-1.5 transition-all cursor-pointer shadow-sm active:scale-95"
+          >
+            <div className={`w-3 h-3 rounded-full ${currentTheme?.previewDot || 'bg-amber-400'} shadow-sm`} />
+            <span className="hidden md:inline">Temas</span>
+          </button>
+
+          {/* Sanctuary Genuine Background Music Button (Off by default, gentle 15% volume) */}
+          <button
+            type="button"
+            onClick={toggleMusic}
+            title={isMusicPlaying ? 'Pausar Música de Fundo do Santuário' : 'Ativar Música de Fundo do Santuário (Desligada por padrão)'}
+            className={`px-2.5 py-1.5 rounded-xl border text-xs font-cinzel font-semibold flex items-center gap-1.5 transition-all cursor-pointer shadow-sm active:scale-95
+              ${isMusicPlaying 
+                ? 'bg-amber-400/20 border-amber-400/70 text-amber-300 shadow-[0_0_12px_rgba(251,191,36,0.3)]' 
+                : 'glass-panel-subtle border-slate-700/60 text-slate-400 hover:text-slate-200'
+              }
+            `}
+          >
+            <Music className={`w-3.5 h-3.5 ${isMusicPlaying ? 'text-amber-400 animate-pulse' : 'text-slate-400'}`} />
+            <span className="hidden lg:inline">{isMusicPlaying ? 'Música Ligada' : 'Música'}</span>
+          </button>
+
+          {/* Reversed Cards Toggle */}
+          <button
+            type="button"
+            onClick={toggleReversed}
+            title={allowReversed ? 'Cartas Invertidas: ATIVADAS' : 'Cartas Invertidas: DESATIVADAS'}
+            className={`px-2.5 py-1.5 rounded-xl border text-xs font-cinzel font-semibold flex items-center gap-1.5 transition-all cursor-pointer shadow-sm active:scale-95
+              ${allowReversed 
+                ? 'bg-amber-400/20 border-amber-400/70 text-amber-300 shadow-[0_0_12px_rgba(251,191,36,0.3)]' 
+                : 'glass-panel-subtle border-slate-700/60 text-slate-400 hover:text-slate-200'
+              }
+            `}
+          >
+            <RotateCw className={`w-3.5 h-3.5 ${allowReversed ? 'text-amber-400' : 'text-slate-500'}`} />
+            <span className="hidden md:inline">Invertidas</span>
+          </button>
+
+          {/* Sound Effects Toggle */}
           <button
             type="button"
             onClick={toggleSound}
             title={isMuted ? 'Ativar Efeitos Sonoros' : 'Silenciar Efeitos Sonoros'}
-            className="p-2 rounded-full glass-panel-subtle text-slate-300 hover:text-amber-300 hover:border-amber-400/50 transition-all cursor-pointer"
+            className="p-2 rounded-xl glass-panel-subtle text-slate-300 hover:text-amber-300 hover:border-amber-400/50 transition-all cursor-pointer"
           >
             {isMuted ? <VolumeX className="w-4 h-4 text-slate-500" /> : <Volume2 className="w-4 h-4 text-amber-400" />}
           </button>
 
+          {/* Zen Mode Toggle */}
+          <button
+            type="button"
+            onClick={onToggleZenMode}
+            title={isZenMode ? 'Sair do Modo Zen' : 'Modo Foco / Zen (Oculta controles da mesa)'}
+            className={`p-2 rounded-xl border transition-all cursor-pointer
+              ${isZenMode 
+                ? 'bg-amber-400/20 border-amber-400 text-amber-300' 
+                : 'glass-panel-subtle border-slate-700/60 text-slate-400 hover:text-slate-200'
+              }
+            `}
+          >
+            {isZenMode ? <Minimize2 className="w-4 h-4 text-amber-400" /> : <Maximize2 className="w-4 h-4" />}
+          </button>
+
+          {/* Guide Button */}
           <button
             type="button"
             onClick={onOpenGuide}
             title="Como funciona a leitura de Tarot"
-            className="p-2 rounded-full glass-panel-subtle text-slate-300 hover:text-amber-300 hover:border-amber-400/50 transition-all cursor-pointer"
+            className="p-2 rounded-xl glass-panel-subtle text-slate-300 hover:text-amber-300 hover:border-amber-400/50 transition-all cursor-pointer"
           >
-            <HelpCircle className="w-4 h-4" />
+            <HelpCircle className="w-4 h-4 text-amber-300/80" />
           </button>
         </div>
       </div>
 
       {/* Main Title & Mystical Emblem */}
       <div className="relative mb-2">
-        {/* Glow behind title */}
         <div className="absolute -inset-4 bg-gradient-to-r from-purple-600/30 via-amber-400/20 to-indigo-600/30 blur-2xl rounded-full pointer-events-none" />
         
         <div className="relative flex items-center justify-center gap-3">
-          <Sparkles className="w-6 h-6 md:w-8 md:h-8 text-amber-400 animate-pulse" />
-          <h1 className="font-cinzel-dec text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black tracking-wider gold-gradient-text">
+          <Sparkles className="w-5 h-5 sm:w-7 sm:h-7 text-amber-400 animate-pulse" />
+          <h1 className={`font-cinzel-dec text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-black tracking-wider ${currentTheme?.goldTextClass || 'gold-gradient-text'}`}>
             LUMINA TAROT
           </h1>
-          <Sparkles className="w-6 h-6 md:w-8 md:h-8 text-amber-400 animate-pulse" />
+          <Sparkles className="w-5 h-5 sm:w-7 sm:h-7 text-amber-400 animate-pulse" />
         </div>
       </div>
 
       {/* Subtitle */}
-      <p className="font-cinzel text-xs sm:text-sm md:text-base text-purple-200/90 tracking-widest uppercase mb-6 max-w-xl">
+      <p className="font-cinzel text-xs sm:text-sm md:text-base text-purple-200/90 tracking-widest uppercase mb-4 max-w-xl">
         Sua Jornada Cósmica Começa • Escolha das 78 Cartas Arcanas
       </p>
 
       {/* Mentalize Question Input Box */}
-      <div className="w-full max-w-2xl relative mb-4">
+      <div className="w-full max-w-2xl relative mb-2">
         <div className={`relative rounded-2xl transition-all duration-300 ${
           isFocused 
             ? 'shadow-[0_0_25px_rgba(251,191,36,0.3)] border border-amber-400/80 bg-slate-950/90' 
@@ -92,7 +251,7 @@ export const Header = ({
               onFocus={() => setIsFocused(true)}
               onBlur={() => setIsFocused(false)}
               placeholder="Mentalize sua intenção ou digite sua pergunta (opcional)..."
-              className="w-full bg-transparent text-sm md:text-base text-slate-100 placeholder:text-slate-500 focus:outline-none"
+              className="w-full bg-transparent text-xs sm:text-sm md:text-base text-slate-100 placeholder:text-slate-500 focus:outline-none"
             />
             {userQuestion && (
               <button

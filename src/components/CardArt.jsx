@@ -6,7 +6,7 @@ import {
 } from 'lucide-react';
 import { SUITS } from '../data/tarotDeck';
 
-export const CardArt = ({ card, isMini = false, showKeywords = true }) => {
+export const CardArt = React.memo(({ card, isMini = false, showKeywords = true }) => {
   const suitConfig = SUITS[card.suit.toUpperCase()] || SUITS.MAJOR;
 
   // Custom rich symbolic vector graphic generator for each Arcana
@@ -152,15 +152,87 @@ export const CardArt = ({ card, isMini = false, showKeywords = true }) => {
 
         case 8: // A Força (Strength)
           return (
-            <svg viewBox="0 0 100 100" className="w-full h-full">
-              {/* Infinity Symbol above */}
-              <path d="M 36 22 C 28 14, 28 30, 36 22 C 44 14, 56 30, 64 22 C 72 14, 72 30, 64 22 C 56 14, 44 30, 36 22" fill="none" stroke="#FBBF24" strokeWidth="2.5" strokeLinecap="round" />
-              {/* Roaring Lion Head Profile */}
-              <path d="M 30 65 Q 35 40 55 42 Q 75 42 75 60 Q 75 75 55 78 Q 40 78 30 65 Z" fill="#B45309" stroke="#F59E0B" strokeWidth="2" />
-              {/* Mane Spikes */}
-              <path d="M 30 45 L 22 48 L 28 55 L 20 60 L 28 68 L 22 75" fill="none" stroke="#FDE68A" strokeWidth="2" strokeLinecap="round" />
-              {/* Gentle Maiden Hands closing the jaw */}
-              <path d="M 52 50 Q 62 48 70 56 M 52 70 Q 62 72 70 66" fill="none" stroke="#FFF" strokeWidth="2" strokeLinecap="round" />
+            <svg viewBox="0 0 100 100" className="w-full h-full text-amber-400">
+              <defs>
+                <linearGradient id="lionManeGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stopColor="#FDE68A" />
+                  <stop offset="35%" stopColor="#F59E0B" />
+                  <stop offset="100%" stopColor="#78350F" />
+                </linearGradient>
+                <linearGradient id="lionFaceGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                  <stop offset="0%" stopColor="#D97706" />
+                  <stop offset="100%" stopColor="#451A03" />
+                </linearGradient>
+                <radialGradient id="forceAuraGrad" cx="50%" cy="32%" r="50%">
+                  <stop offset="0%" stopColor="#FDE68A" stopOpacity="0.45" />
+                  <stop offset="100%" stopColor="#FDE68A" stopOpacity="0" />
+                </radialGradient>
+              </defs>
+
+              {/* Radiant Background Sacred Aura */}
+              <circle cx="50" cy="40" r="38" fill="url(#forceAuraGrad)" />
+
+              {/* Floating Glowing Infinity Lemniscate (Divine Spirit over Matter) */}
+              <g className="drop-shadow-[0_0_8px_rgba(251,191,36,0.85)]">
+                <path 
+                  d="M 34 16 C 26 9, 26 23, 34 16 C 42 9, 58 23, 66 16 C 74 9, 74 23, 66 16 C 58 9, 42 23, 34 16 Z" 
+                  fill="none" 
+                  stroke="#FDE68A" 
+                  strokeWidth="2.2" 
+                  strokeLinecap="round" 
+                />
+                <circle cx="50" cy="16" r="2" fill="#FFF" />
+              </g>
+
+              {/* Majestic Regal Lion Mane */}
+              <g fill="url(#lionManeGrad)" stroke="#92400E" strokeWidth="0.8">
+                {/* Full mane silhouette */}
+                <path d="M 50 26 Q 30 24 22 36 Q 16 48 18 64 Q 22 78 36 86 Q 50 92 64 86 Q 78 78 82 64 Q 84 48 78 36 Q 70 24 50 26 Z" />
+                {/* Golden fire tufts */}
+                <path d="M 22 36 Q 14 30 18 42 Q 12 48 16 58 Q 10 68 24 76" fill="none" stroke="#FDE68A" strokeWidth="1.2" strokeLinecap="round" />
+                <path d="M 78 36 Q 86 30 82 42 Q 88 48 84 58 Q 90 68 76 76" fill="none" stroke="#FDE68A" strokeWidth="1.2" strokeLinecap="round" />
+              </g>
+
+              {/* Noble Lion Face */}
+              <path d="M 32 44 Q 30 68 50 78 Q 70 68 68 44 Q 50 38 32 44 Z" fill="url(#lionFaceGrad)" stroke="#F59E0B" strokeWidth="1.2" />
+
+              {/* Lion Ears */}
+              <path d="M 30 38 Q 25 30 34 32 Z" fill="#78350F" stroke="#FDE68A" strokeWidth="0.8" />
+              <path d="M 70 38 Q 75 30 66 32 Z" fill="#78350F" stroke="#FDE68A" strokeWidth="0.8" />
+
+              {/* Serene, Peaceful Eyes (Tamed Passion) */}
+              <path d="M 38 48 Q 44 45 46 50 Q 42 52 38 48 Z" fill="#FEF08A" stroke="#78350F" strokeWidth="0.75" />
+              <circle cx="43" cy="48.5" r="1.2" fill="#451A03" />
+              <path d="M 62 48 Q 56 45 54 50 Q 58 52 62 48 Z" fill="#FEF08A" stroke="#78350F" strokeWidth="0.75" />
+              <circle cx="57" cy="48.5" r="1.2" fill="#451A03" />
+
+              {/* Nose, Snout & Whiskers */}
+              <polygon points="50,56 46,62 54,62" fill="#451A03" stroke="#FDE68A" strokeWidth="0.5" />
+              <path d="M 50 62 L 50 67 M 50 67 Q 44 71 40 66 M 50 67 Q 56 71 60 66" fill="none" stroke="#FEF08A" strokeWidth="1.2" strokeLinecap="round" />
+              <line x1="38" y1="64" x2="26" y2="62" stroke="#FDE68A" strokeWidth="0.7" opacity="0.8" />
+              <line x1="38" y1="67" x2="25" y2="68" stroke="#FDE68A" strokeWidth="0.7" opacity="0.8" />
+              <line x1="62" y1="64" x2="74" y2="62" stroke="#FDE68A" strokeWidth="0.7" opacity="0.8" />
+              <line x1="62" y1="67" x2="75" y2="68" stroke="#FDE68A" strokeWidth="0.7" opacity="0.8" />
+
+              {/* Maiden's Gentle Hand with Golden Bracelet Caressing the Lion */}
+              <g className="drop-shadow-[0_0_6px_rgba(255,255,255,0.7)]">
+                <path d="M 74 88 Q 66 76 56 73" fill="none" stroke="#F8FAFC" strokeWidth="2.5" strokeLinecap="round" />
+                <circle cx="68" cy="80" r="3" fill="none" stroke="#FBBF24" strokeWidth="1.2" />
+                <path d="M 56 73 Q 48 76 42 71" fill="none" stroke="#FFF" strokeWidth="2" strokeLinecap="round" />
+                <path d="M 54 70 Q 48 72 44 68" fill="none" stroke="#FFF" strokeWidth="1.5" strokeLinecap="round" />
+              </g>
+
+              {/* Garland of Mystic White & Gold Roses */}
+              <g>
+                <circle cx="28" cy="34" r="3" fill="#FFF" stroke="#FDE68A" strokeWidth="0.8" />
+                <circle cx="28" cy="34" r="1" fill="#F59E0B" />
+                <circle cx="72" cy="34" r="3" fill="#FFF" stroke="#FDE68A" strokeWidth="0.8" />
+                <circle cx="72" cy="34" r="1" fill="#F59E0B" />
+                <circle cx="50" cy="84" r="3.5" fill="#FFF" stroke="#FDE68A" strokeWidth="0.8" />
+                <circle cx="50" cy="84" r="1.2" fill="#F59E0B" />
+                <circle cx="36" cy="84" r="2.5" fill="#FDE68A" stroke="#D97706" strokeWidth="0.5" />
+                <circle cx="64" cy="84" r="2.5" fill="#FDE68A" stroke="#D97706" strokeWidth="0.5" />
+              </g>
             </svg>
           );
 
@@ -492,31 +564,50 @@ export const CardArt = ({ card, isMini = false, showKeywords = true }) => {
         <div className="absolute bottom-0 right-0 w-2 h-2 border-b-2 border-r-2 border-amber-400" />
       </div>
 
-      {/* Header: Roman Numeral / Rank & Element Indicator */}
-      <div className="relative z-10 px-3 pt-2.5 pb-1 flex items-center justify-between">
-        <div className="flex items-center gap-1">
+      {/* Header: Roman Numeral / Rank & Element / Astro Indicator */}
+      <div className="relative z-10 px-2.5 sm:px-3 pt-2.5 pb-1 flex items-center justify-between">
+        <div className="flex items-center gap-1.5">
           <span className="font-cinzel text-xs md:text-sm font-bold text-amber-300 tracking-wider">
             {card.roman}
           </span>
+          {card.astroGlyph && (
+            <span 
+              className="text-xs text-amber-400 font-serif drop-shadow-[0_0_6px_rgba(251,191,36,0.6)]"
+              title={`Astrologia: ${card.planet || card.element}`}
+            >
+              {card.astroGlyph}
+            </span>
+          )}
         </div>
         
-        <span 
-          className="text-[9px] uppercase tracking-wider px-1.5 py-0.5 rounded border border-amber-400/20 bg-slate-900/60 font-medium"
-          style={{ color: suitConfig.color }}
-        >
-          {card.arcana === 'Major' ? 'Arcano Maior' : suitConfig.element}
-        </span>
+        <div className="flex items-center gap-1">
+          {card.isReversed && (
+            <span className="text-[8px] uppercase tracking-wider px-1.5 py-0.2 rounded bg-red-950/90 border border-red-500/50 text-red-300 font-cinzel font-bold">
+              Invertida
+            </span>
+          )}
+          <span 
+            className="text-[9px] uppercase tracking-wider px-1.5 py-0.5 rounded border border-amber-400/20 bg-slate-900/70 font-medium flex items-center gap-1"
+            style={{ color: suitConfig.color }}
+          >
+            {(card.alchemySymbol || suitConfig.alchemySymbol) && (
+              <span className="text-[11px] leading-none opacity-90">{card.alchemySymbol || suitConfig.alchemySymbol}</span>
+            )}
+            <span>{card.arcana === 'Major' ? 'Arcano Maior' : suitConfig.element}</span>
+          </span>
+        </div>
       </div>
 
-      {/* Main Center Artwork */}
-      <div className="relative z-10 flex-1 flex items-center justify-center p-2">
+      {/* Main Center Artwork (supports 180deg flip if reversed) */}
+      <div className={`relative z-10 flex-1 flex items-center justify-center p-2 transition-transform duration-500 ${card.isReversed ? 'rotate-180' : ''}`}>
         {renderCardSymbolism()}
       </div>
 
       {/* Footer: Card Name & Keywords */}
       <div className="relative z-10 px-2.5 pb-2.5 pt-1 text-center bg-slate-950/80 backdrop-blur-sm border-t border-amber-500/20">
-        <h4 className="font-cinzel text-xs md:text-sm font-bold text-slate-100 leading-tight truncate tracking-wide">
-          {card.name}
+        <h4 className="font-cinzel text-xs md:text-sm font-bold text-slate-100 leading-tight truncate tracking-wide flex items-center justify-center gap-1">
+          <span>{card.name}</span>
+          {card.isReversed && <span className="text-[9px] text-red-400 font-sans font-normal">(Inv.)</span>}
         </h4>
         
         {!isMini && (
@@ -537,4 +628,4 @@ export const CardArt = ({ card, isMini = false, showKeywords = true }) => {
       </div>
     </div>
   );
-};
+});

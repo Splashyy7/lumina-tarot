@@ -4,7 +4,7 @@ import { CardArt } from './CardArt';
 import { Sparkles, Eye, X, ZoomIn, Compass } from 'lucide-react';
 import { audio } from '../utils/audio';
 
-export const SpreadSlot = ({ 
+export const SpreadSlot = React.memo(({ 
   slotIndex, 
   positionInfo, 
   card, 
@@ -169,4 +169,4 @@ export const SpreadSlot = ({
       </div>
     </div>
   );
-};
+});

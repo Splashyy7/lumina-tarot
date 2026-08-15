@@ -5,6 +5,7 @@ export const SUITS = {
   MAJOR: {
     id: 'major',
     name: 'Arcanos Maiores',
+    alchemySymbol: '🜀',
     element: 'Éter / Destino',
     icon: 'Sparkles',
     color: '#FBBF24',
@@ -14,6 +15,7 @@ export const SUITS = {
   WANDS: {
     id: 'wands',
     name: 'Paus (Fogo)',
+    alchemySymbol: '🜂',
     element: 'Fogo',
     icon: 'Flame',
     color: '#F97316',
@@ -23,6 +25,7 @@ export const SUITS = {
   CUPS: {
     id: 'cups',
     name: 'Copas (Água)',
+    alchemySymbol: '🜄',
     element: 'Água',
     icon: 'Droplets',
     color: '#38BDF8',
@@ -32,6 +35,7 @@ export const SUITS = {
   SWORDS: {
     id: 'swords',
     name: 'Espadas (Ar)',
+    alchemySymbol: '🜁',
     element: 'Ar',
     icon: 'Wind',
     color: '#E2E8F0',
@@ -41,6 +45,7 @@ export const SUITS = {
   PENTACLES: {
     id: 'pentacles',
     name: 'Ouros (Terra)',
+    alchemySymbol: '🜃',
     element: 'Terra',
     icon: 'Mountain',
     color: '#34D399',
@@ -53,6 +58,8 @@ export const TAROT_DECK = [
   // ==================== 22 ARCANOS MAIORES ====================
   {
     id: 'major_0',
+    astroGlyph: '♅',
+    alchemySymbol: '🜀',
     number: 0,
     roman: '0',
     name: 'O Louco',
@@ -72,6 +79,8 @@ export const TAROT_DECK = [
   },
   {
     id: 'major_1',
+    astroGlyph: '☿',
+    alchemySymbol: '🜀',
     number: 1,
     roman: 'I',
     name: 'O Mago',
@@ -91,6 +100,8 @@ export const TAROT_DECK = [
   },
   {
     id: 'major_2',
+    astroGlyph: '☽',
+    alchemySymbol: '🜀',
     number: 2,
     roman: 'II',
     name: 'A Sacerdotisa',
@@ -110,6 +121,8 @@ export const TAROT_DECK = [
   },
   {
     id: 'major_3',
+    astroGlyph: '♀',
+    alchemySymbol: '🜀',
     number: 3,
     roman: 'III',
     name: 'A Imperatriz',
@@ -129,6 +142,8 @@ export const TAROT_DECK = [
   },
   {
     id: 'major_4',
+    astroGlyph: '♈',
+    alchemySymbol: '🜀',
     number: 4,
     roman: 'IV',
     name: 'O Imperador',
@@ -148,6 +163,8 @@ export const TAROT_DECK = [
   },
   {
     id: 'major_5',
+    astroGlyph: '♉',
+    alchemySymbol: '🜀',
     number: 5,
     roman: 'V',
     name: 'O Hierofante',
@@ -167,6 +184,8 @@ export const TAROT_DECK = [
   },
   {
     id: 'major_6',
+    astroGlyph: '♊',
+    alchemySymbol: '🜀',
     number: 6,
     roman: 'VI',
     name: 'Os Enamorados',
@@ -186,6 +205,8 @@ export const TAROT_DECK = [
   },
   {
     id: 'major_7',
+    astroGlyph: '♋',
+    alchemySymbol: '🜀',
     number: 7,
     roman: 'VII',
     name: 'O Carro',
@@ -205,6 +226,8 @@ export const TAROT_DECK = [
   },
   {
     id: 'major_8',
+    astroGlyph: '♌',
+    alchemySymbol: '🜀',
     number: 8,
     roman: 'VIII',
     name: 'A Força',
@@ -224,6 +247,8 @@ export const TAROT_DECK = [
   },
   {
     id: 'major_9',
+    astroGlyph: '♍',
+    alchemySymbol: '🜀',
     number: 9,
     roman: 'IX',
     name: 'O Eremita',
@@ -243,6 +268,8 @@ export const TAROT_DECK = [
   },
   {
     id: 'major_10',
+    astroGlyph: '♃',
+    alchemySymbol: '🜀',
     number: 10,
     roman: 'X',
     name: 'A Roda da Fortuna',
@@ -262,6 +289,8 @@ export const TAROT_DECK = [
   },
   {
     id: 'major_11',
+    astroGlyph: '♎',
+    alchemySymbol: '🜀',
     number: 11,
     roman: 'XI',
     name: 'A Justiça',
@@ -281,6 +310,8 @@ export const TAROT_DECK = [
   },
   {
     id: 'major_12',
+    astroGlyph: '♆',
+    alchemySymbol: '🜀',
     number: 12,
     roman: 'XII',
     name: 'O Enforcado',
@@ -300,6 +331,8 @@ export const TAROT_DECK = [
   },
   {
     id: 'major_13',
+    astroGlyph: '♏',
+    alchemySymbol: '🜀',
     number: 13,
     roman: 'XIII',
     name: 'A Morte',
@@ -319,6 +352,8 @@ export const TAROT_DECK = [
   },
   {
     id: 'major_14',
+    astroGlyph: '♐',
+    alchemySymbol: '🜀',
     number: 14,
     roman: 'XIV',
     name: 'A Temperança',
@@ -338,6 +373,8 @@ export const TAROT_DECK = [
   },
   {
     id: 'major_15',
+    astroGlyph: '♑',
+    alchemySymbol: '🜀',
     number: 15,
     roman: 'XV',
     name: 'O Diabo',
@@ -357,6 +394,8 @@ export const TAROT_DECK = [
   },
   {
     id: 'major_16',
+    astroGlyph: '♂',
+    alchemySymbol: '🜀',
     number: 16,
     roman: 'XVI',
     name: 'A Torre',
@@ -376,6 +415,8 @@ export const TAROT_DECK = [
   },
   {
     id: 'major_17',
+    astroGlyph: '♒',
+    alchemySymbol: '🜀',
     number: 17,
     roman: 'XVII',
     name: 'A Estrela',
@@ -395,6 +436,8 @@ export const TAROT_DECK = [
   },
   {
     id: 'major_18',
+    astroGlyph: '♓',
+    alchemySymbol: '🜀',
     number: 18,
     roman: 'XVIII',
     name: 'A Lua',
@@ -414,6 +457,8 @@ export const TAROT_DECK = [
   },
   {
     id: 'major_19',
+    astroGlyph: '☉',
+    alchemySymbol: '🜀',
     number: 19,
     roman: 'XIX',
     name: 'O Sol',
@@ -433,6 +478,8 @@ export const TAROT_DECK = [
   },
   {
     id: 'major_20',
+    astroGlyph: '♇',
+    alchemySymbol: '🜀',
     number: 20,
     roman: 'XX',
     name: 'O Julgamento',
@@ -452,6 +499,8 @@ export const TAROT_DECK = [
   },
   {
     id: 'major_21',
+    astroGlyph: '♄',
+    alchemySymbol: '🜀',
     number: 21,
     roman: 'XXI',
     name: 'O Mundo',
@@ -473,6 +522,7 @@ export const TAROT_DECK = [
   // ==================== 14 CARTAS DE PAUS (WANDS - FOGO) ====================
   {
     id: 'wands_1',
+    alchemySymbol: '🜂',
     number: 1,
     roman: 'Ás',
     name: 'Ás de Paus',
@@ -491,6 +541,7 @@ export const TAROT_DECK = [
   },
   {
     id: 'wands_2',
+    alchemySymbol: '🜂',
     number: 2,
     roman: '2',
     name: 'Dois de Paus',
@@ -509,6 +560,7 @@ export const TAROT_DECK = [
   },
   {
     id: 'wands_3',
+    alchemySymbol: '🜂',
     number: 3,
     roman: '3',
     name: 'Três de Paus',
@@ -527,6 +579,7 @@ export const TAROT_DECK = [
   },
   {
     id: 'wands_4',
+    alchemySymbol: '🜂',
     number: 4,
     roman: '4',
     name: 'Quatro de Paus',
@@ -545,6 +598,7 @@ export const TAROT_DECK = [
   },
   {
     id: 'wands_5',
+    alchemySymbol: '🜂',
     number: 5,
     roman: '5',
     name: 'Cinco de Paus',
@@ -563,6 +617,7 @@ export const TAROT_DECK = [
   },
   {
     id: 'wands_6',
+    alchemySymbol: '🜂',
     number: 6,
     roman: '6',
     name: 'Seis de Paus',
@@ -581,6 +636,7 @@ export const TAROT_DECK = [
   },
   {
     id: 'wands_7',
+    alchemySymbol: '🜂',
     number: 7,
     roman: '7',
     name: 'Sete de Paus',
@@ -599,6 +655,7 @@ export const TAROT_DECK = [
   },
   {
     id: 'wands_8',
+    alchemySymbol: '🜂',
     number: 8,
     roman: '8',
     name: 'Oito de Paus',
@@ -617,6 +674,7 @@ export const TAROT_DECK = [
   },
   {
     id: 'wands_9',
+    alchemySymbol: '🜂',
     number: 9,
     roman: '9',
     name: 'Nove de Paus',
@@ -635,6 +693,7 @@ export const TAROT_DECK = [
   },
   {
     id: 'wands_10',
+    alchemySymbol: '🜂',
     number: 10,
     roman: '10',
     name: 'Dez de Paus',
@@ -653,6 +712,7 @@ export const TAROT_DECK = [
   },
   {
     id: 'wands_page',
+    alchemySymbol: '🜂',
     number: 11,
     roman: 'Valete',
     name: 'Valete de Paus',
@@ -671,6 +731,7 @@ export const TAROT_DECK = [
   },
   {
     id: 'wands_knight',
+    alchemySymbol: '🜂',
     number: 12,
     roman: 'Cavaleiro',
     name: 'Cavaleiro de Paus',
@@ -689,6 +750,7 @@ export const TAROT_DECK = [
   },
   {
     id: 'wands_queen',
+    alchemySymbol: '🜂',
     number: 13,
     roman: 'Rainha',
     name: 'Rainha de Paus',
@@ -707,6 +769,7 @@ export const TAROT_DECK = [
   },
   {
     id: 'wands_king',
+    alchemySymbol: '🜂',
     number: 14,
     roman: 'Rei',
     name: 'Rei de Paus',
@@ -727,6 +790,7 @@ export const TAROT_DECK = [
   // ==================== 14 CARTAS DE COPAS (CUPS - ÁGUA) ====================
   {
     id: 'cups_1',
+    alchemySymbol: '🜄',
     number: 1,
     roman: 'Ás',
     name: 'Ás de Copas',
@@ -745,6 +809,7 @@ export const TAROT_DECK = [
   },
   {
     id: 'cups_2',
+    alchemySymbol: '🜄',
     number: 2,
     roman: '2',
     name: 'Dois de Copas',
@@ -763,6 +828,7 @@ export const TAROT_DECK = [
   },
   {
     id: 'cups_3',
+    alchemySymbol: '🜄',
     number: 3,
     roman: '3',
     name: 'Três de Copas',
@@ -781,6 +847,7 @@ export const TAROT_DECK = [
   },
   {
     id: 'cups_4',
+    alchemySymbol: '🜄',
     number: 4,
     roman: '4',
     name: 'Quatro de Copas',
@@ -799,6 +866,7 @@ export const TAROT_DECK = [
   },
   {
     id: 'cups_5',
+    alchemySymbol: '🜄',
     number: 5,
     roman: '5',
     name: 'Cinco de Copas',
@@ -817,6 +885,7 @@ export const TAROT_DECK = [
   },
   {
     id: 'cups_6',
+    alchemySymbol: '🜄',
     number: 6,
     roman: '6',
     name: 'Seis de Copas',
@@ -835,6 +904,7 @@ export const TAROT_DECK = [
   },
   {
     id: 'cups_7',
+    alchemySymbol: '🜄',
     number: 7,
     roman: '7',
     name: 'Sete de Copas',
@@ -853,6 +923,7 @@ export const TAROT_DECK = [
   },
   {
     id: 'cups_8',
+    alchemySymbol: '🜄',
     number: 8,
     roman: '8',
     name: 'Oito de Copas',
@@ -871,6 +942,7 @@ export const TAROT_DECK = [
   },
   {
     id: 'cups_9',
+    alchemySymbol: '🜄',
     number: 9,
     roman: '9',
     name: 'Nove de Copas',
@@ -889,6 +961,7 @@ export const TAROT_DECK = [
   },
   {
     id: 'cups_10',
+    alchemySymbol: '🜄',
     number: 10,
     roman: '10',
     name: 'Dez de Copas',
@@ -907,6 +980,7 @@ export const TAROT_DECK = [
   },
   {
     id: 'cups_page',
+    alchemySymbol: '🜄',
     number: 11,
     roman: 'Valete',
     name: 'Valete de Copas',
@@ -925,6 +999,7 @@ export const TAROT_DECK = [
   },
   {
     id: 'cups_knight',
+    alchemySymbol: '🜄',
     number: 12,
     roman: 'Cavaleiro',
     name: 'Cavaleiro de Copas',
@@ -943,6 +1018,7 @@ export const TAROT_DECK = [
   },
   {
     id: 'cups_queen',
+    alchemySymbol: '🜄',
     number: 13,
     roman: 'Rainha',
     name: 'Rainha de Copas',
@@ -961,6 +1037,7 @@ export const TAROT_DECK = [
   },
   {
     id: 'cups_king',
+    alchemySymbol: '🜄',
     number: 14,
     roman: 'Rei',
     name: 'Rei de Copas',
@@ -981,6 +1058,7 @@ export const TAROT_DECK = [
   // ==================== 14 CARTAS DE ESPADAS (SWORDS - AR) ====================
   {
     id: 'swords_1',
+    alchemySymbol: '🜁',
     number: 1,
     roman: 'Ás',
     name: 'Ás de Espadas',
@@ -999,6 +1077,7 @@ export const TAROT_DECK = [
   },
   {
     id: 'swords_2',
+    alchemySymbol: '🜁',
     number: 2,
     roman: '2',
     name: 'Dois de Espadas',
@@ -1017,6 +1096,7 @@ export const TAROT_DECK = [
   },
   {
     id: 'swords_3',
+    alchemySymbol: '🜁',
     number: 3,
     roman: '3',
     name: 'Três de Espadas',
@@ -1035,6 +1115,7 @@ export const TAROT_DECK = [
   },
   {
     id: 'swords_4',
+    alchemySymbol: '🜁',
     number: 4,
     roman: '4',
     name: 'Quatro de Espadas',
@@ -1053,6 +1134,7 @@ export const TAROT_DECK = [
   },
   {
     id: 'swords_5',
+    alchemySymbol: '🜁',
     number: 5,
     roman: '5',
     name: 'Cinco de Espadas',
@@ -1071,6 +1153,7 @@ export const TAROT_DECK = [
   },
   {
     id: 'swords_6',
+    alchemySymbol: '🜁',
     number: 6,
     roman: '6',
     name: 'Seis de Espadas',
@@ -1089,6 +1172,7 @@ export const TAROT_DECK = [
   },
   {
     id: 'swords_7',
+    alchemySymbol: '🜁',
     number: 7,
     roman: '7',
     name: 'Sete de Espadas',
@@ -1107,6 +1191,7 @@ export const TAROT_DECK = [
   },
   {
     id: 'swords_8',
+    alchemySymbol: '🜁',
     number: 8,
     roman: '8',
     name: 'Oito de Espadas',
@@ -1125,6 +1210,7 @@ export const TAROT_DECK = [
   },
   {
     id: 'swords_9',
+    alchemySymbol: '🜁',
     number: 9,
     roman: '9',
     name: 'Nove de Espadas',
@@ -1143,6 +1229,7 @@ export const TAROT_DECK = [
   },
   {
     id: 'swords_10',
+    alchemySymbol: '🜁',
     number: 10,
     roman: '10',
     name: 'Dez de Espadas',
@@ -1161,6 +1248,7 @@ export const TAROT_DECK = [
   },
   {
     id: 'swords_page',
+    alchemySymbol: '🜁',
     number: 11,
     roman: 'Valete',
     name: 'Valete de Espadas',
@@ -1179,6 +1267,7 @@ export const TAROT_DECK = [
   },
   {
     id: 'swords_knight',
+    alchemySymbol: '🜁',
     number: 12,
     roman: 'Cavaleiro',
     name: 'Cavaleiro de Espadas',
@@ -1197,6 +1286,7 @@ export const TAROT_DECK = [
   },
   {
     id: 'swords_queen',
+    alchemySymbol: '🜁',
     number: 13,
     roman: 'Rainha',
     name: 'Rainha de Espadas',
@@ -1215,6 +1305,7 @@ export const TAROT_DECK = [
   },
   {
     id: 'swords_king',
+    alchemySymbol: '🜁',
     number: 14,
     roman: 'Rei',
     name: 'Rei de Espadas',
@@ -1235,6 +1326,7 @@ export const TAROT_DECK = [
   // ==================== 14 CARTAS DE OUROS (PENTACLES - TERRA) ====================
   {
     id: 'pentacles_1',
+    alchemySymbol: '🜃',
     number: 1,
     roman: 'Ás',
     name: 'Ás de Ouros',
@@ -1253,6 +1345,7 @@ export const TAROT_DECK = [
   },
   {
     id: 'pentacles_2',
+    alchemySymbol: '🜃',
     number: 2,
     roman: '2',
     name: 'Dois de Ouros',
@@ -1271,6 +1364,7 @@ export const TAROT_DECK = [
   },
   {
     id: 'pentacles_3',
+    alchemySymbol: '🜃',
     number: 3,
     roman: '3',
     name: 'Três de Ouros',
@@ -1289,6 +1383,7 @@ export const TAROT_DECK = [
   },
   {
     id: 'pentacles_4',
+    alchemySymbol: '🜃',
     number: 4,
     roman: '4',
     name: 'Quatro de Ouros',
@@ -1307,6 +1402,7 @@ export const TAROT_DECK = [
   },
   {
     id: 'pentacles_5',
+    alchemySymbol: '🜃',
     number: 5,
     roman: '5',
     name: 'Cinco de Ouros',
@@ -1325,6 +1421,7 @@ export const TAROT_DECK = [
   },
   {
     id: 'pentacles_6',
+    alchemySymbol: '🜃',
     number: 6,
     roman: '6',
     name: 'Seis de Ouros',
@@ -1343,6 +1440,7 @@ export const TAROT_DECK = [
   },
   {
     id: 'pentacles_7',
+    alchemySymbol: '🜃',
     number: 7,
     roman: '7',
     name: 'Sete de Ouros',
@@ -1361,6 +1459,7 @@ export const TAROT_DECK = [
   },
   {
     id: 'pentacles_8',
+    alchemySymbol: '🜃',
     number: 8,
     roman: '8',
     name: 'Oito de Ouros',
@@ -1379,6 +1478,7 @@ export const TAROT_DECK = [
   },
   {
     id: 'pentacles_9',
+    alchemySymbol: '🜃',
     number: 9,
     roman: '9',
     name: 'Nove de Ouros',
@@ -1397,6 +1497,7 @@ export const TAROT_DECK = [
   },
   {
     id: 'pentacles_10',
+    alchemySymbol: '🜃',
     number: 10,
     roman: '10',
     name: 'Dez de Ouros',
@@ -1415,6 +1516,7 @@ export const TAROT_DECK = [
   },
   {
     id: 'pentacles_page',
+    alchemySymbol: '🜃',
     number: 11,
     roman: 'Valete',
     name: 'Valete de Ouros',
@@ -1433,6 +1535,7 @@ export const TAROT_DECK = [
   },
   {
     id: 'pentacles_knight',
+    alchemySymbol: '🜃',
     number: 12,
     roman: 'Cavaleiro',
     name: 'Cavaleiro de Ouros',
@@ -1451,6 +1554,7 @@ export const TAROT_DECK = [
   },
   {
     id: 'pentacles_queen',
+    alchemySymbol: '🜃',
     number: 13,
     roman: 'Rainha',
     name: 'Rainha de Ouros',
@@ -1469,6 +1573,7 @@ export const TAROT_DECK = [
   },
   {
     id: 'pentacles_king',
+    alchemySymbol: '🜃',
     number: 14,
     roman: 'Rei',
     name: 'Rei de Ouros',

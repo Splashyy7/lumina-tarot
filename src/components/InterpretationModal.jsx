@@ -3,12 +3,13 @@ import { motion, AnimatePresence } from 'framer-motion';
 import confetti from 'canvas-confetti';
 import { CardArt } from './CardArt';
 import { 
-  X, Sparkles, BookOpen, Share2, Copy, 
+  X, Sparkles, BookOpen, Share2, Copy, Bookmark,
   RotateCcw, Check, Flame, Droplets, Wind, Mountain, 
   Feather, Shield, Sun, Star 
 } from 'lucide-react';
 import { SUITS } from '../data/tarotDeck';
 import { audio } from '../utils/audio';
+import { historyService } from '../utils/history';
 
 export const InterpretationModal = ({ 
   spreadConfig, 
@@ -18,6 +19,7 @@ export const InterpretationModal = ({
   onResetReading 
 }) => {
   const [copied, setCopied] = useState(false);
+  const [saved, setSaved] = useState(false);
 
   useEffect(() => {
     // Launch celestial gold & purple star confetti
@@ -303,14 +305,35 @@ export const InterpretationModal = ({
 
         {/* Bottom Actions Bar - Full Mobile Width */}
         <div className="pt-6 border-t border-amber-500/20 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
-          <button
-            type="button"
-            onClick={handleCopyReading}
-            className="w-full sm:w-auto px-5 py-3 sm:py-2.5 rounded-xl bg-purple-950/80 hover:bg-purple-900 border border-purple-500/40 text-purple-200 hover:text-amber-200 text-xs font-semibold flex items-center justify-center gap-2 transition-all cursor-pointer shadow-md active:scale-95"
-          >
-            {copied ? <Check className="w-4 h-4 text-emerald-400" /> : <Copy className="w-4 h-4" />}
-            <span>{copied ? 'Leitura Copiada com Sucesso!' : 'Copiar Leitura Completa'}</span>
-          </button>
+          <div className="flex items-center gap-2 w-full sm:w-auto">
+            <button
+              type="button"
+              onClick={handleCopyReading}
+              className="flex-1 sm:flex-initial px-4 py-3 sm:py-2.5 rounded-xl bg-purple-950/80 hover:bg-purple-900 border border-purple-500/40 text-purple-200 hover:text-amber-200 text-xs font-semibold flex items-center justify-center gap-2 transition-all cursor-pointer shadow-md active:scale-95"
+            >
+              {copied ? <Check className="w-4 h-4 text-emerald-400" /> : <Copy className="w-4 h-4" />}
+              <span>{copied ? 'Copiada!' : 'Copiar Leitura'}</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => {
+                audio.playSelect();
+                historyService.saveReading({ spreadConfig, chosenCards, userQuestion });
+                setSaved(true);
+                setTimeout(() => setSaved(false), 3000);
+              }}
+              className={`flex-1 sm:flex-initial px-4 py-3 sm:py-2.5 rounded-xl border text-xs font-semibold flex items-center justify-center gap-2 transition-all cursor-pointer shadow-md active:scale-95
+                ${saved 
+                  ? 'bg-emerald-950/80 border-emerald-400 text-emerald-300' 
+                  : 'glass-panel-subtle hover:border-amber-400/60 text-amber-300'
+                }
+              `}
+            >
+              {saved ? <Check className="w-4 h-4 text-emerald-400" /> : <Bookmark className="w-4 h-4 text-amber-400" />}
+              <span>{saved ? 'Salvo no Diário!' : 'Salvar no Diário'}</span>
+            </button>
+          </div>
 
           <div className="flex items-center gap-2 sm:gap-3 w-full sm:w-auto">
             <button
