@@ -110,6 +110,12 @@ export const InterpretationModal = ({
     setTimeout(() => setShareNotice(false), 2500);
   };
 
+  const handleClose = () => {
+    audio.playCloseModal();
+    if (onResetReading) onResetReading();
+    onClose();
+  };
+
   const handleReset = () => {
     audio.playSelect();
     if (onResetReading) onResetReading();
@@ -135,7 +141,7 @@ export const InterpretationModal = ({
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
         className="fixed inset-0 bg-slate-950/90 backdrop-blur-xl" 
-        onClick={onClose} 
+        onClick={handleClose} 
       />
 
       {/* Modal Dialog Card */}
@@ -159,7 +165,7 @@ export const InterpretationModal = ({
 
           <button
             type="button"
-            onClick={onClose}
+            onClick={handleClose}
             className="p-1.5 rounded-full bg-slate-900/80 border border-slate-700 text-slate-400 hover:text-amber-300 hover:border-amber-400/50 transition-all cursor-pointer"
           >
             <X className="w-5 h-5" />

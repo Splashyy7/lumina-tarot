@@ -292,6 +292,9 @@ export const TarotTable = () => {
         e.preventDefault();
         bgMusicService.toggle();
       } else if (e.key === 'Escape') {
+        if (isInterpretationOpen) {
+          handleResetSpread();
+        }
         setInspectingCardData(null);
         setIsInterpretationOpen(false);
         setIsGuideOpen(false);
@@ -420,6 +423,7 @@ export const TarotTable = () => {
             chosenCards={chosenCards.filter(Boolean)}
             userQuestion={userQuestion}
             onClose={() => {
+              handleResetSpread();
               refreshHistoryCount();
               setIsInterpretationOpen(false);
             }}
