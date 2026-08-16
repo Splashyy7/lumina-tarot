@@ -116,6 +116,12 @@ export const InterpretationModal = ({
     onClose();
   };
 
+  const handleConclude = () => {
+    audio.playConcludeReading();
+    if (onResetReading) onResetReading();
+    onClose();
+  };
+
   const handleInspectCard = (card, pos) => {
     audio.playInspectZoom();
     setSelectedCardDetail({ card, positionInfo: pos });
@@ -433,10 +439,7 @@ export const InterpretationModal = ({
 
             <button
               type="button"
-              onClick={() => {
-                audio.playConcludeReading();
-                onClose();
-              }}
+              onClick={handleConclude}
               className="flex-1 sm:flex-initial px-6 py-2.5 rounded-xl bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-500 hover:to-yellow-400 text-slate-950 font-cinzel font-bold text-xs cursor-pointer transition-all shadow-md active:scale-95"
             >
               Concluir Leitura

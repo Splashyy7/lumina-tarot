@@ -133,10 +133,11 @@ export const TarotTable = () => {
     });
   }, [chosenCards]);
 
-  // Reset entire spread and restore deck
+  // Reset entire spread, restore deck, and clear question
   const handleResetSpread = useCallback(() => {
     setChosenCards(new Array(activeSpread.positions.length).fill(null));
     setDeck(prevDeck => prevDeck.map(card => ({ ...card, estaEscolhida: false, isReversed: false })));
+    setUserQuestion('');
   }, [activeSpread]);
 
   // Spread Change Request Handler (Checks if table has cards to show custom overlay)
