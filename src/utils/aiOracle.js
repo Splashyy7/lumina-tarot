@@ -1,5 +1,7 @@
 // Real AI Oracle Integration via Serverless Cloudflare Worker Proxy (100% Free, Zero Login, Zero User Keys)
-// With Full Archetypal Fallback Engine & Bulletproof Section Parser
+// With Full Archetypal Fallback Engine, Bulletproof Section Parser & Direct Yes/No AI Engine
+
+import { getYesNoEvaluation, generateOfflineYesNoReading } from './yesNoOracle';
 
 // Cloudflare Worker Endpoint
 const DEFAULT_WORKER_URL = import.meta.env.VITE_ORACLE_API_URL || 'https://lumina-oracle.jpedrooliveiragritz.workers.dev';
@@ -17,7 +19,7 @@ const cleanHeader = (str) => {
     .trim();
 };
 
-// Parse structured markdown sections with total resilience
+// Parse structured markdown sections with total resilience for Standard Readings
 const parseAiSections = (text, fallbackData) => {
   if (!text) return null;
 
@@ -62,8 +64,96 @@ const parseAiSections = (text, fallbackData) => {
   };
 };
 
+// Parse structured Yes/No AI responses with bulletproof format recovery
+const parseYesNoAiResponse = (text, fallbackData) => {
+  if (!text) return fallbackData;
+
+  let verdict = '';
+  let answer = '';
+  let tip = '';
+
+  // Match structured labels
+  const verdictMatch = text.match(/(?:VEREDITO|VEREDICTO|RESULTADO)\s*:\s*([^\n]+)/i);
+  const answerMatch = text.match(/(?:RESPOSTA|EXPLICAÇÃO|SÍNTESE)\s*:\s*([\s\S]*?)(?=(?:DICA|CONSELHO|VEREDITO|$))/i);
+  const tipMatch = text.match(/(?:DICA|CONSELHO|ORIENTAÇÃO)\s*:\s*([\s\S]*?)$/i);
+
+  if (verdictMatch && verdictMatch[1]) {
+    verdict = verdictMatch[1].replace(/[*_#\[\]]/g, '').trim();
+  }
+
+  if (answerMatch && answerMatch[1]) {
+    answer = answerMatch[1].replace(/[*_#\[\]]/g, '').trim();
+  }
+
+  if (tipMatch && tipMatch[1]) {
+    tip = tipMatch[1].replace(/[*_#\[\]]/g, '').trim();
+  }
+
+  // Handle older 3-section format if received from older worker versions
+  if (!answer && (text.includes('###') || text.includes('Diagnóstico') || text.includes('Conselho'))) {
+    const diag = text.match(/(?:###\s*(?:🔍|🌌)|(?:🔍|🌌))[^\n]*\n?([\s\S]*?)(?=(?:###|$))/i);
+    const adv = text.match(/(?:###\s*(?:🧭|🗝️)|(?:🧭|🗝️))[^\n]*\n?([\s\S]*?)$/i);
+
+    if (diag && diag[1]) {
+      const cleanDiag = diag[1].replace(/[*_#]/g, '').trim();
+      const sentences = cleanDiag.match(/[^.!?]+[.!?]+/g) || [cleanDiag];
+      answer = sentences.slice(0, 2).join(' ').trim();
+    }
+    if (adv && adv[1]) {
+      const cleanAdv = adv[1].replace(/[*_#]/g, '').trim();
+      const advSentences = cleanAdv.match(/[^.!?]+[.!?]+/g) || [cleanAdv];
+      tip = advSentences.slice(0, 1).join(' ').trim();
+    }
+  }
+
+  // Fallback field assignments
+  if (!verdict) verdict = fallbackData?.verdict || 'SIM';
+  if (!answer) {
+    const lines = text.replace(/[*_#]/g, '').split('\n').map(l => l.trim()).filter(Boolean);
+    answer = lines[0] || fallbackData?.answer || 'As cartas mostram um movimento direto para a sua questão.';
+  }
+  if (!tip) tip = fallbackData?.tip || 'Mantenha a firmeza nas suas decisões e observe os detalhes práticos.';
+
+  // Ensure tip starts with practical nuance if missing
+  if (fallbackData?.tip && (!tip.toLowerCase().includes('depende') && !tip.toLowerCase().includes('mas') && !tip.toLowerCase().includes('a não ser') && !tip.toLowerCase().includes('sim') && !tip.toLowerCase().includes('não'))) {
+    tip = `${fallbackData.tip} (${tip})`;
+  }
+
+  // Determine styling based on verdict text
+  const vUpper = verdict.toUpperCase();
+  let type = 'yes';
+  let color = 'text-emerald-400';
+  let badgeBg = 'bg-emerald-500/20 border-emerald-400/60';
+
+  if (vUpper.includes('NÃO') || vUpper.includes('NAO') || vUpper.includes('BLOQUEIO') || vUpper.includes('CAUTELA')) {
+    type = 'no';
+    color = 'text-rose-400';
+    badgeBg = 'bg-rose-500/20 border-rose-400/60';
+  } else if (vUpper.includes('DEPENDE') || vUpper.includes('TALVEZ') || vUpper.includes('NEUTRO') || vUpper.includes('PAUSA')) {
+    type = 'maybe';
+    color = 'text-amber-400';
+    badgeBg = 'bg-amber-500/20 border-amber-400/60';
+  } else if (vUpper.includes('CONDIÇÃO') || vUpper.includes('CONDICAO') || vUpper.includes('MAS')) {
+    type = 'conditional_yes';
+    color = 'text-amber-300';
+    badgeBg = 'bg-amber-500/20 border-amber-400/60';
+  }
+
+  return {
+    isAi: true,
+    verdict,
+    answer,
+    tip,
+    type,
+    color,
+    badgeBg,
+    percentage: fallbackData?.percentage || (type === 'yes' ? 90 : type === 'no' ? 20 : 55),
+    rawText: text.trim()
+  };
+};
+
 export const aiOracleService = {
-  // Call Cloudflare Worker AI Proxy (Gemini 2.0 / Flash - Real AI, Zero Login)
+  // Call Cloudflare Worker AI Proxy for Standard Multi-Card Spreads
   async generateRealAiReading({ spreadConfig, chosenCards, userQuestion }) {
     const validCards = chosenCards.filter(Boolean);
     if (validCards.length === 0) return null;
@@ -95,41 +185,7 @@ export const aiOracleService = {
               advice: c.advice,
               positionName: spreadConfig.positions?.[i]?.name || `Posição ${i + 1}`
             })),
-            userQuestion: (userQuestion || '').trim(),
-            systemPrompt: `Você é um leitor de Tarot tradicional, objetivo, direto e sem rodeios.
-SEU OBJETIVO:
-Responder de forma REAL, ESPECÍFICA e CONCRETA exatamente ao que foi perguntado, interpretando o que as cartas revelam sobre a situação ou sobre as pessoas envolvidas.
-
-REGRAS OBRIGATÓRIAS:
-1. RESPONDA À PERGUNTA FEITA (PROIBIDO SERMÃO DE AUTOAJUDA / "FOQUE EM SI"):
-- Se a pergunta for sobre OUTRA PESSOA (ex: relacionamentos, sentimentos do parceiro, traição, intenções de sócio, chefe, amigo ou família):
-  * PROIBIDO fugir para discursos de terapia ou autoajuda (NUNCA diga "você não controla o outro", "foque em si mesma", "cure seu amor próprio", "trabalhe seu interior").
-  * RESPONDA O QUE AS CARTAS MOSTRAM SOBRE A OUTRA PESSOA: se há interesse real, frieza, mentiras, atração física, falsidade, lealdade, indecisão ou manipulação da parte dela.
-
-2. SEJA DIRETO E HONESTO COM CARTAS DIFÍCEIS (SEM PASSAR PANO):
-- Se saírem cartas desafiadoras (ex: O Diabo, A Torre, 3 de Espadas, 10 de Espadas, 7 de Espadas, 5 de Ouros, A Lua, A Morte, cartas Invertidas), NÃO tente dourar a pílula nem forçar positividade.
-- Relacione diretamente com a realidade:
-  * O Diabo: atração puramente física ou por interesse financeiro/conveniência, jogo de poder, apego tóxico, mentira, manipulação.
-  * 7 de Espadas: falsidade, agir pelas costas, esconder coisas, traição, desonestidade.
-  * A Torre: rompimento repentino, verdades duras que vieram à tona, perda inesperada, fim abrupto.
-  * 3 de Espadas / 10 de Espadas: decepção, traição, dor de um término ou conversa que machucou.
-  * A Lua: mentiras, ilusões, ciúmes, coisas ocultas.
-  * 5 de Ouros: aperto financeiro, falta de apoio, desamparo.
-  * 2 de Copas / O Sol / Os Enamorados / 10 de Copas: afeto sincero, conexão real, compatibilidade e lealdade.
-
-3. LINGUAGEM CLARA, HUMANA E ACESSÍVEL:
-- Use português simples e natural do dia a dia.
-- PROIBIDO usar palavras difíceis, arcaicas ou floreios poéticos (como transmutação, epifania, diletantismo, éter, arquetípico).
-
-4. ESTRUTURA OBRIGATÓRIA EM 3 SEÇÕES:
-### 🔍 O que as cartas mostram
-(Responda diretamente à dúvida sobre a situação ou a outra pessoa, sem meias palavras)
-
-### 💡 O que está acontecendo por trás
-(Explique as intenções, sentimentos, atitudes ou desafios reais que as cartas apontam)
-
-### 🧭 O que fazer na prática
-(Dê uma orientação prática para a situação real, dizendo que atitude tomar ou do que fugir)`
+            userQuestion: (userQuestion || '').trim()
           })
         });
 
@@ -153,7 +209,60 @@ REGRAS OBRIGATÓRIAS:
     return fallback;
   },
 
-  // Realistic, Direct & Honest Local Fallback
+  // Direct, Concise & Objective Yes/No AI Reading with Actionable Practical Tips
+  async generateYesNoAiReading({ card, userQuestion }) {
+    if (!card) return null;
+
+    const evalData = getYesNoEvaluation(card, card.isReversed);
+    const fallback = generateOfflineYesNoReading({ card, userQuestion, evaluation: evalData });
+    const workerUrl = DEFAULT_WORKER_URL || localStorage.getItem('lumina_worker_url') || '';
+
+    if (workerUrl) {
+      try {
+        const response = await fetch(workerUrl, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            mode: 'yes_no',
+            spreadConfig: {
+              name: 'Sim ou Não',
+              isYesNo: true
+            },
+            chosenCards: [{
+              name: card.name,
+              arcana: card.arcana,
+              suit: card.suit,
+              isReversed: Boolean(card.isReversed),
+              light: card.light,
+              shadow: card.shadow,
+              advice: card.advice
+            }],
+            userQuestion: (userQuestion || '').trim()
+          })
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          const generatedText = data.text || data.reading || data.content || '';
+          if (generatedText && generatedText.length > 10) {
+            const parsed = parseYesNoAiResponse(generatedText, fallback);
+            return {
+              source: 'cloudflare_gemini_ai',
+              ...parsed
+            };
+          }
+        }
+      } catch (err) {
+        console.warn('Worker proxy for Yes/No unavailable, using resilient fallback:', err);
+      }
+    }
+
+    return fallback;
+  },
+
+  // Realistic, Direct & Honest Local Fallback for Spreads
   generateOfflineFallback({ spreadConfig, chosenCards, userQuestion }) {
     const validCards = chosenCards.filter(Boolean);
     const first = validCards[0];

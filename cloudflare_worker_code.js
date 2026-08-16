@@ -39,13 +39,35 @@ export default {
 
     try {
       const rawBody = await request.text();
-      const { spreadConfig, chosenCards, userQuestion } = JSON.parse(rawBody);
+      const { spreadConfig, chosenCards, userQuestion, mode, customPrompt } = JSON.parse(rawBody || '{}');
 
-      const cardsText = (chosenCards || []).map(c => 
-        `- Posição: ${c.positionName || 'Altar'} | Carta: ${c.name} (${c.arcana || ''}${c.suit ? ', ' + c.suit : ''})${c.isReversed ? ' [INVERTIDA]' : ' [DIRETA]'}. Luz: ${c.light || ''}. Sombra: ${c.shadow || ''}. Conselho: "${c.advice || ''}".`
-      ).join('\n');
+      const isYesNo = mode === 'yes_no' || spreadConfig?.isYesNo || spreadConfig?.name === 'Sim ou Não';
 
-      const prompt = `Você é o Oráculo Ancestral do Lumina Tarot. Crie uma interpretação oracular profunda, lúcida, poética e acolhedora.
+      let prompt = '';
+      if (isYesNo) {
+        const card = chosenCards?.[0] || {};
+        prompt = `Você é o Oráculo do Sim ou Não do Lumina Tarot.
+Sua missão é dar uma resposta EXTREMAMENTE OBJETIVA, DIRETA, LÚCIDA e CURTA para a pergunta do consulente, baseada no simbolismo do arcano tirado.
+
+PERGUNTA DO CONSULENTE: ${userQuestion ? `"${userQuestion}"` : 'Consulta direta ao Oráculo.'}
+CARTA REVELADA: ${card.name || 'Arcano'} (${card.arcana || ''}${card.suit ? ', ' + card.suit : ''})${card.isReversed ? ' [INVERTIDA]' : ' [DIRETA]'}.
+Palavras-chave: Luz: ${card.light || ''} | Sombra: ${card.shadow || ''} | Conselho: "${card.advice || ''}".
+
+DIRETRIZES FUNDAMENTAIS OBRIGATÓRIAS:
+1. Responda em Português do Brasil de forma DIRETA, CLARA, OBJETIVA e CONCISA.
+2. Seja cirúrgico: a resposta deve ter no máximo 1 a 2 frases curtas. PROIBIDO textos longos, pregações ou prolixidade.
+3. Se a resposta depender de alguma atitude, condição ou se for um alerta, forneça uma "dica" ou condição prática em 1 frase (ex: "Sim, mas depende de você tomar a iniciativa antes que o prazo acabe", "Não, a não ser que você esclareça essa dúvida pessoalmente", "Depende de você manter a discrição e não contar seus planos a terceiros").
+4. ESTRUTURE A RESPOSTA RIGOROSAMENTE NO SEGUINTE FORMATO:
+
+VEREDITO: [Escolha apenas um: SIM | NÃO | SIM, COM CONDIÇÃO | NÃO, A NÃO SER QUE | DEPENDE DE VOCÊ]
+RESPOSTA: [1 ou 2 frases curtas, objetivas e diretas respondendo à pergunta com base na energia da carta]
+DICA: [1 frase curta com a dica prática ou condição fundamental]`;
+      } else {
+        const cardsText = (chosenCards || []).map(c => 
+          `- Posição: ${c.positionName || 'Altar'} | Carta: ${c.name} (${c.arcana || ''}${c.suit ? ', ' + c.suit : ''})${c.isReversed ? ' [INVERTIDA]' : ' [DIRETA]'}. Luz: ${c.light || ''}. Sombra: ${c.shadow || ''}. Conselho: "${c.advice || ''}".`
+        ).join('\n');
+
+        prompt = customPrompt || `Você é o Oráculo Ancestral do Lumina Tarot. Crie uma interpretação oracular profunda, lúcida, poética e acolhedora.
 
 CONSULTA:
 - Tiragem: ${spreadConfig?.name || 'Tiragem Livre'}
@@ -67,6 +89,7 @@ DIRETRIZES FUNDAMENTAIS:
 
 ### 🗝️ O Conselho Sagrado do Oráculo
 (Um conselho oracular claro, inspirador e transformador em 1 parágrafo de 80 a 120 palavras)`;
+      }
 
       // Modelos ativos verificados na conta
       const modelsToTry = [
