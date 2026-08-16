@@ -96,39 +96,40 @@ export const aiOracleService = {
               positionName: spreadConfig.positions?.[i]?.name || `Posição ${i + 1}`
             })),
             userQuestion: (userQuestion || '').trim(),
-            systemPrompt: `Você é um leitor de Tarot experiente, honesto, direto e realista.
+            systemPrompt: `Você é um leitor de Tarot tradicional, objetivo, direto e sem rodeios.
 SEU OBJETIVO:
-Dar uma resposta REAL, ESPECÍFICA e DIRETA para a pessoa, conectando as cartas com situações práticas do dia a dia, sem fugir da pergunta e sem enrolação.
+Responder de forma REAL, ESPECÍFICA e CONCRETA exatamente ao que foi perguntado, interpretando o que as cartas revelam sobre a situação ou sobre as pessoas envolvidas.
 
 REGRAS OBRIGATÓRIAS:
-1. PROIBIDO RESPOSTAS GENÉRICAS OU EVASIVAS:
-- Nunca use frases vazias de horóscopo como "o universo está agindo", "energias cósmicas fluem", "confie no fluxo", "coisas boas virão".
-- Responda DIRETAMENTE à pergunta ou dúvida da pessoa. Diga o que está acontecendo de verdade, o que está favorável e o que está dando errado.
+1. RESPONDA À PERGUNTA FEITA (PROIBIDO SERMÃO DE AUTOAJUDA / "FOQUE EM SI"):
+- Se a pergunta for sobre OUTRA PESSOA (ex: relacionamentos, sentimentos do parceiro, traição, intenções de sócio, chefe, amigo ou família):
+  * PROIBIDO fugir para discursos de terapia ou autoajuda (NUNCA diga "você não controla o outro", "foque em si mesma", "cure seu amor próprio", "trabalhe seu interior").
+  * RESPONDA O QUE AS CARTAS MOSTRAM SOBRE A OUTRA PESSOA: se há interesse real, frieza, mentiras, atração física, falsidade, lealdade, indecisão ou manipulação da parte dela.
 
-2. SEJA HONESTO COM CARTAS DIFÍCEIS OU SOMBRIAS (SEM PASSAR PANO):
-- Se saírem cartas desafiadoras ou invertidas (como O Diabo, A Torre, 3 de Espadas, 10 de Espadas, 7 de Espadas, 5 de Ouros, 5 de Copas, A Lua, A Morte, O Enforcado, etc.), NUNCA tente suavizar ou inventar um lado bonitinho.
-- Relacione a carta diretamente com problemas reais do cotidiano:
-  * O Diabo: apegos tóxicos, vícios, dependência emocional, ficar preso a um emprego ou relacionamento ruim por comodismo ou dinheiro, manipulação, autossabotagem.
-  * A Torre: rompimento repentino, choque de realidade, perda inesperada, verdade dura que veio à tona, estrutura frágil que desabou.
-  * 3 de Espadas / 10 de Espadas: coração partido, traição, decepção profunda, sensação de estar no fundo do poço, conversa que machucou.
-  * 7 de Espadas: mentiras, alguém agindo pelas costas, fuga de responsabilidades, atalhos desonestos.
-  * 5 de Ouros / Pentáculos: aperto financeiro, medo da escassez, sensação de estar desamparado ou excluído.
-  * A Lua: mentiras, desconfiança, ciúmes, ilusões, coisas escondidas.
-  * O Louco (invertido) / 2 de Espadas: imprudência, fingir que não vê o problema, teimosia em não decidir.
+2. SEJA DIRETO E HONESTO COM CARTAS DIFÍCEIS (SEM PASSAR PANO):
+- Se saírem cartas desafiadoras (ex: O Diabo, A Torre, 3 de Espadas, 10 de Espadas, 7 de Espadas, 5 de Ouros, A Lua, A Morte, cartas Invertidas), NÃO tente dourar a pílula nem forçar positividade.
+- Relacione diretamente com a realidade:
+  * O Diabo: atração puramente física ou por interesse financeiro/conveniência, jogo de poder, apego tóxico, mentira, manipulação.
+  * 7 de Espadas: falsidade, agir pelas costas, esconder coisas, traição, desonestidade.
+  * A Torre: rompimento repentino, verdades duras que vieram à tona, perda inesperada, fim abrupto.
+  * 3 de Espadas / 10 de Espadas: decepção, traição, dor de um término ou conversa que machucou.
+  * A Lua: mentiras, ilusões, ciúmes, coisas ocultas.
+  * 5 de Ouros: aperto financeiro, falta de apoio, desamparo.
+  * 2 de Copas / O Sol / Os Enamorados / 10 de Copas: afeto sincero, conexão real, compatibilidade e lealdade.
 
 3. LINGUAGEM CLARA, HUMANA E ACESSÍVEL:
-- Use português simples, direto e do dia a dia.
-- Nada de termos rebuscados ou arcaicos (como transmutação, epifania, diletantismo, éter, arquetípico).
+- Use português simples e natural do dia a dia.
+- PROIBIDO usar palavras difíceis, arcaicas ou floreios poéticos (como transmutação, epifania, diletantismo, éter, arquetípico).
 
-4. ESTRUTURA OBRIGATÓRIA (3 SEÇÕES):
+4. ESTRUTURA OBRIGATÓRIA EM 3 SEÇÕES:
 ### 🔍 O que as cartas mostram
-(Diga a realidade dos fatos e responda à dúvida da pessoa sem rodeios)
+(Responda diretamente à dúvida sobre a situação ou a outra pessoa, sem meias palavras)
 
 ### 💡 O que está acontecendo por trás
-(Explique as causas reais, os sentimentos, as atitudes erradas ou os desafios práticos envolvidos)
+(Explique as intenções, sentimentos, atitudes ou desafios reais que as cartas apontam)
 
 ### 🧭 O que fazer na prática
-(Dê um conselho realista e aplicável: o que a pessoa deve fazer e o que deve parar de fazer agora)`
+(Dê uma orientação prática para a situação real, dizendo que atitude tomar ou do que fugir)`
           })
         });
 
@@ -159,6 +160,7 @@ REGRAS OBRIGATÓRIAS:
     const middle = validCards[Math.floor(validCards.length / 2)] || first;
     const last = validCards[validCards.length - 1] || first;
     const q = (userQuestion || '').trim();
+    const isAboutOtherPerson = /\b(ele|ela|ex|namorad|marid|espos|ficante|s[oó]ci|chefe|amig|trai[çc]|gosta|sente|voltar|pensa)\b/i.test(q);
 
     // Identify shadow or warning cards
     const shadowCard = validCards.find(c => 
@@ -168,10 +170,18 @@ REGRAS OBRIGATÓRIAS:
 
     let diagnosis = '';
     if (q) {
-      if (first.isReversed || (shadowCard && shadowCard.id === first.id)) {
-        diagnosis = `Respondendo diretamente sobre "${q}": a carta ${first.name} ${first.isReversed ? '(Invertida)' : ''} aponta um sinal de alerta claro. Na prática, você está lidando com ${first.shadow ? first.shadow.toLowerCase() : 'bloqueios e descontentamento'}, o que indica que insistir no mesmo caminho sem mudar de atitude só vai trazer mais desgaste.`;
+      if (isAboutOtherPerson) {
+        if (shadowCard && (shadowCard.id === first.id || shadowCard.id === middle.id)) {
+          diagnosis = `Sobre a sua pergunta ("${q}"): as cartas mostram uma postura desfavorável ou complicada da outra parte. A presença de ${shadowCard.name} ${shadowCard.isReversed ? '(Invertida)' : ''} indica ${shadowCard.shadow ? shadowCard.shadow.toLowerCase() : 'atitudes duvidosas, distanciamento ou falta de transparência'}. Não há sinais de estabilidade ou clareza vindos de lá no momento.`;
+        } else {
+          diagnosis = `Sobre a sua pergunta ("${q}"): a carta ${first.name} indica que o envolvimento e as atitudes da outra pessoa estão ligadas a ${first.light.toLowerCase()}. Há movimentação concreta acontecendo nesse cenário.`;
+        }
       } else {
-        diagnosis = `Respondendo diretamente sobre "${q}": a carta ${first.name} indica que o cenário atual depende de ${first.light.toLowerCase()}. Não fique esperando as coisas se resolverem sozinhas; você precisa assumir a postura que essa carta pede.`;
+        if (first.isReversed || (shadowCard && shadowCard.id === first.id)) {
+          diagnosis = `Respondendo diretamente sobre "${q}": a carta ${first.name} ${first.isReversed ? '(Invertida)' : ''} aponta um sinal de alerta claro. Na prática, você está lidando com ${first.shadow ? first.shadow.toLowerCase() : 'bloqueios e descontentamento'}, o que indica que insistir no mesmo caminho sem mudar de atitude só vai trazer mais desgaste.`;
+        } else {
+          diagnosis = `Respondendo diretamente sobre "${q}": a carta ${first.name} indica que o cenário atual depende de ${first.light.toLowerCase()}. As coisas estão caminhando de acordo com essa energia.`;
+        }
       }
     } else {
       diagnosis = `A carta ${first.name} ${first.isReversed ? '(Invertida)' : ''} mostra que o seu momento atual está marcado por ${first.isReversed ? first.shadow?.toLowerCase() : first.light?.toLowerCase()}. É preciso encarar a situação de frente, sem fingir que está tudo bem quando não está.`;
@@ -179,12 +189,12 @@ REGRAS OBRIGATÓRIAS:
 
     let dynamics = '';
     if (shadowCard && shadowCard.id !== first.id) {
-      dynamics = `O ponto crítico desta tiragem é a presença de ${shadowCard.name} ${shadowCard.isReversed ? '(Invertida)' : ''}. No dia a dia, isso aponta para problemas como ${shadowCard.shadow?.toLowerCase() || 'apego, ilusão ou desgaste'}. Em conjunto com ${middle.name}, isso mostra que há atitudes ou relações que estão te prendendo e impedindo o seu avanço.`;
+      dynamics = `O ponto crítico desta tiragem é a presença de ${shadowCard.name} ${shadowCard.isReversed ? '(Invertida)' : ''}. No dia a dia, isso aponta para problemas como ${shadowCard.shadow?.toLowerCase() || 'apego, ilusão ou desgaste'}. Em conjunto com ${middle.name}, isso mostra que há atitudes ou fatores externos pesando negativamente.`;
     } else {
-      dynamics = `A relação entre ${first.name} e ${middle.name} mostra o que está pesando no momento: de um lado a necessidade de agir, e do outro o risco de cair em ${middle.isReversed ? middle.shadow?.toLowerCase() : 'hesitação ou apego a velhos hábitos'}.`;
+      dynamics = `A relação entre ${first.name} e ${middle.name} mostra o que está pesando no momento: de um lado a necessidade de ação prática, e do outro ${middle.isReversed ? middle.shadow?.toLowerCase() : middle.light?.toLowerCase()}.`;
     }
 
-    let advice = `O conselho direto da carta ${last.name} é: "${last.advice}". Seja realista, pare de adiar decisões difíceis e corte o que está te fazendo mal.`;
+    let advice = `O conselho direto da carta ${last.name} é: "${last.advice}". Tenha clareza, tome sua decisão com base nos fatos reais e não aceite menos do que o justo.`;
 
     return {
       source: 'local_fallback',
