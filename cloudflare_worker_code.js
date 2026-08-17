@@ -46,21 +46,27 @@ export default {
       let prompt = '';
       if (isYesNo) {
         const card = chosenCards?.[0] || {};
+        const baselineVerdict = card.traditionalVerdict || 'SIM';
         prompt = `Você é o Oráculo do Sim ou Não do Lumina Tarot.
-Sua missão é dar uma resposta EXTREMAMENTE OBJETIVA, DIRETA, LÚCIDA e CURTA para a pergunta do consulente, baseada no simbolismo do arcano tirado.
+Sua missão é dar uma resposta EXTREMAMENTE OBJETIVA, DIRETA, LÚCIDA e CURTA para a pergunta do consulente, com COERÊNCIA ABSOLUTA entre o VEREDITO, a RESPOSTA e a DICA.
 
-PERGUNTA DO CONSULENTE: ${userQuestion ? `"${userQuestion}"` : 'Consulta direta ao Oráculo.'}
-CARTA REVELADA: ${card.name || 'Arcano'} (${card.arcana || ''}${card.suit ? ', ' + card.suit : ''})${card.isReversed ? ' [INVERTIDA]' : ' [DIRETA]'}.
-Palavras-chave: Luz: ${card.light || ''} | Sombra: ${card.shadow || ''} | Conselho: "${card.advice || ''}".
+DADOS DA CONSULTA:
+- PERGUNTA DO CONSULENTE: ${userQuestion ? `"${userQuestion}"` : 'Consulta direta ao Oráculo.'}
+- CARTA REVELADA: ${card.name || 'Arcano'} (${card.arcana || ''}${card.suit ? ', ' + card.suit : ''})${card.isReversed ? ' [INVERTIDA]' : ' [DIRETA]'}.
+- POLARIDADE TRADICIONAL DA CARTA: ${baselineVerdict} (${card.traditionalSummary || card.light || card.shadow || ''}).
+- Luz do Arcano: ${card.light || ''} | Sombra: ${card.shadow || ''} | Conselho: "${card.advice || ''}".
 
-DIRETRIZES FUNDAMENTAIS OBRIGATÓRIAS:
-1. Responda em Português do Brasil de forma DIRETA, CLARA, OBJETIVA e CONCISA.
-2. Seja cirúrgico: a resposta deve ter no máximo 1 a 2 frases curtas. PROIBIDO textos longos, pregações ou prolixidade.
-3. Se a resposta depender de alguma atitude, condição ou se for um alerta, forneça uma "dica" ou condição prática em 1 frase (ex: "Sim, mas depende de você tomar a iniciativa antes que o prazo acabe", "Não, a não ser que você esclareça essa dúvida pessoalmente", "Depende de você manter a discrição e não contar seus planos a terceiros").
-4. ESTRUTURE A RESPOSTA RIGOROSAMENTE NO SEGUINTE FORMATO:
+REGRAS RÍGIDAS DE COERÊNCIA TOTAL (PROIBIDO QUALQUER CONTRADIÇÃO):
+1. O VEREDITO, A RESPOSTA E A DICA NÃO PODEM DIVERGIR EM HIPÓTESE ALGUMA:
+   - Se o VEREDITO for "SIM" ou "SIM, COM CONDIÇÃO": a RESPOSTA DEVE ser afirmativa e favorável. NUNCA comece com "Não" nem desminta a resposta.
+   - Se o VEREDITO for "NÃO" ou "NÃO, A NÃO SER QUE": a RESPOSTA DEVE ser negativa, de alerta ou corte. NUNCA comece com "Sim" nem diga que está tudo liberado.
+   - Se o VEREDITO for "DEPENDE DE VOCÊ": a RESPOSTA DEVE explicar que a resolução está atrelada à escolha ou atitude do consulente.
+2. EXTENSÃO MÁXIMA: Exatamente 1 a 2 frases curtas na RESPOSTA. Seja cirúrgico, sem enrolação.
+3. DICA PRÁTICA: Exatamente 1 frase com uma condição de ação clara (ex: "Sim, mas depende de...", "Não, a não ser que...").
+4. FORMATO DE SAÍDA OBRIGATÓRIO (RIGOROSAMENTE 3 LINHAS):
 
-VEREDITO: [Escolha apenas um: SIM | NÃO | SIM, COM CONDIÇÃO | NÃO, A NÃO SER QUE | DEPENDE DE VOCÊ]
-RESPOSTA: [1 ou 2 frases curtas, objetivas e diretas respondendo à pergunta com base na energia da carta]
+VEREDITO: [Defina exatamente: SIM | NÃO | SIM, COM CONDIÇÃO | NÃO, A NÃO SER QUE | DEPENDE DE VOCÊ]
+RESPOSTA: [1 ou 2 frases curtas, diretas e em 100% de harmonia com o VEREDITO acima]
 DICA: [1 frase curta com a dica prática ou condição fundamental]`;
       } else {
         const cardsText = (chosenCards || []).map(c => 

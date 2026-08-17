@@ -119,8 +119,22 @@ const parseYesNoAiResponse = (text, fallbackData) => {
     tip = `${fallbackData.tip} (${tip})`;
   }
 
-  // Determine styling based on verdict text
-  const vUpper = verdict.toUpperCase();
+  // Reconcile and guarantee zero divergence between verdict and answer:
+  const lowerAnswer = answer.toLowerCase().trim();
+  let vUpper = verdict.toUpperCase();
+
+  // If answer explicitly starts with a negative but verdict is positive, align verdict
+  if ((lowerAnswer.startsWith('não') || lowerAnswer.startsWith('nao')) && (vUpper.includes('SIM') && !vUpper.includes('NÃO'))) {
+    verdict = fallbackData?.verdict || 'NÃO / CAUTELA';
+    vUpper = verdict.toUpperCase();
+  }
+  // If answer explicitly starts with affirmative but verdict is strictly negative, align verdict
+  else if ((lowerAnswer.startsWith('sim') || lowerAnswer.startsWith('com certeza')) && (vUpper.includes('NÃO') || vUpper.includes('NAO'))) {
+    verdict = fallbackData?.verdict || 'SIM, COM CONDIÇÃO';
+    vUpper = verdict.toUpperCase();
+  }
+
+  // Determine styling based on final verified verdict text
   let type = 'yes';
   let color = 'text-emerald-400';
   let badgeBg = 'bg-emerald-500/20 border-emerald-400/60';
@@ -237,7 +251,11 @@ export const aiOracleService = {
               isReversed: Boolean(card.isReversed),
               light: card.light,
               shadow: card.shadow,
-              advice: card.advice
+              advice: card.advice,
+              traditionalVerdict: evalData.verdict,
+              traditionalType: evalData.type,
+              traditionalSummary: evalData.summary,
+              traditionalTip: evalData.tip
             }],
             userQuestion: (userQuestion || '').trim()
           })
