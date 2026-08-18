@@ -302,10 +302,44 @@ export const getYesNoEvaluation = (card, isReversed = false) => {
   };
 };
 
+const SELF_HARM_REGEX = /\b(suic[ií]d|me\s+matar|morrer|automutila|tirar\s+a\s+(minha\s+)?vida|cortar\s+os\s+pulsos|acabar\s+com\s+a\s+(minha\s+)?vida|acabar\s+com\s+tudo|me\s+enforcar|quero\s+morrer)\b/i;
+const NECROMANCY_REGEX = /\b(parente\s+morto|parente\s+falecid|falar\s+com\s+(o\s+|a\s+)?(morto|falecid|morta|falecida|espirito|espírito)|psicograf|alma\s+do\s+meu|alma\s+da\s+minha|falar\s+com\s+quem\s+morreu|esp[ií]rito\s+do\s+meu|m[eé]dium|incorporar)\b/i;
+
 // Generate an ultra-direct, concise local fallback response matching the AI format
 export const generateOfflineYesNoReading = ({ card, userQuestion, evaluation }) => {
-  const evalData = evaluation || getYesNoEvaluation(card, card?.isReversed);
   const q = (userQuestion || '').trim();
+
+  // Ethical Safeguard: Suicide and Self-Harm Prevention
+  if (SELF_HARM_REGEX.test(q)) {
+    return {
+      isAi: false,
+      verdict: 'BUSQUE APOIO PROFISSIONAL',
+      answer: 'O Tarot não realiza leituras sobre morte ou autodestruição. Sua vida tem valor sagrado e inestimável, e você não precisa enfrentar essa dor sozinho.',
+      tip: 'Por favor, procure ajuda humana imediata: no Brasil, ligue gratuitamente para o CVV no número 188 ou consulte um profissional de saúde mental.',
+      type: 'maybe',
+      color: 'text-amber-400',
+      badgeBg: 'bg-amber-500/20 border-amber-400/60',
+      percentage: 50,
+      rawText: 'VEREDITO: BUSQUE APOIO PROFISSIONAL\nRESPOSTA: O Tarot não realiza leituras sobre morte ou autodestruição. Sua vida tem valor sagrado e inestimável, e você não precisa enfrentar essa dor sozinho.\nDICA: Por favor, procure ajuda humana imediata: no Brasil, ligue gratuitamente para o CVV no número 188 ou consulte um profissional de saúde mental.'
+    };
+  }
+
+  // Ethical Safeguard: Necromancy and Contact with Deceased
+  if (NECROMANCY_REGEX.test(q)) {
+    return {
+      isAi: false,
+      verdict: 'FOCO NO AUTOCONHECIMENTO',
+      answer: 'O Tarot é um espelho de orientação e autoconhecimento para os vivos no plano terreno, não uma ferramenta mediúnica de contato com os mortos.',
+      tip: 'Honre a memória e o amor de quem partiu, focando na sua própria cura emocional, no luto e no momento presente.',
+      type: 'maybe',
+      color: 'text-amber-400',
+      badgeBg: 'bg-amber-500/20 border-amber-400/60',
+      percentage: 50,
+      rawText: 'VEREDITO: FOCO NO AUTOCONHECIMENTO\nRESPOSTA: O Tarot é um espelho de orientação e autoconhecimento para os vivos no plano terreno, não uma ferramenta mediúnica de contato com os mortos.\nDICA: Honre a memória e o amor de quem partiu, focando na sua própria cura emocional, no luto e no momento presente.'
+    };
+  }
+
+  const evalData = evaluation || getYesNoEvaluation(card, card?.isReversed);
 
   let directAnswer = '';
   if (q) {

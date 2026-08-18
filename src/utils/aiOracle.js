@@ -287,6 +287,31 @@ export const aiOracleService = {
     const middle = validCards[Math.floor(validCards.length / 2)] || first;
     const last = validCards[validCards.length - 1] || first;
     const q = (userQuestion || '').trim();
+
+    // Ethical Safeguard: Suicide and Self-Harm Prevention
+    const isSelfHarm = /\b(suic[ií]d|me\s+matar|morrer|automutila|tirar\s+a\s+(minha\s+)?vida|cortar\s+os\s+pulsos|acabar\s+com\s+a\s+(minha\s+)?vida|acabar\s+com\s+tudo|me\s+enforcar|quero\s+morrer)\b/i.test(q);
+    if (isSelfHarm) {
+      return {
+        source: 'ethical_safeguard',
+        diagnosis: 'O Lumina Tarot é um oráculo sagrado dedicado à preservação da vida, ao autoconhecimento e à esperança. Não realizamos leituras sobre autodestruição, morte ou ideação suicida. Reconhecemos que o momento pode estar gerando uma dor imensa, mas você não precisa carregar esse sofrimento sozinho.',
+        dynamics: 'Momentos de profunda escuridão e desamparo exigem acolhimento humano real, escuta atenta e apoio profissional especializado. Há caminhos de reconstrução e alívio quando permitimos que pessoas qualificadas nos estendam a mão.',
+        advice: 'Por favor, busque ajuda humana imediata: no Brasil, ligue gratuitamente para o Centro de Valorização da Vida (CVV) pelo telefone 188 (atendimento sigiloso 24 horas) ou procure um serviço de emergência de saúde mental.',
+        text: '### 🌌 O Diagnóstico da Intenção\nO Lumina Tarot é um oráculo sagrado dedicado à preservação da vida, ao autoconhecimento e à esperança. Não realizamos leituras sobre autodestruição, morte ou ideação suicida. Reconhecemos que o momento pode estar gerando uma dor imensa, mas você não precisa carregar esse sofrimento sozinho.\n\n### 🔮 A Dinâmica das Forças Ocultas\nMomentos de profunda escuridão e desamparo exigem acolhimento humano real, escuta atenta e apoio profissional especializado. Há caminhos de reconstrução e alívio quando permitimos que pessoas qualificadas nos estendam a mão.\n\n### 🗝️ O Conselho Sagrado do Oráculo\nPor favor, busque ajuda humana imediata: no Brasil, ligue gratuitamente para o Centro de Valorização da Vida (CVV) pelo telefone 188 (atendimento sigiloso 24 horas) ou procure um serviço de emergência de saúde mental.'
+      };
+    }
+
+    // Ethical Safeguard: Necromancy and Contact with Deceased
+    const isNecromancy = /\b(parente\s+morto|parente\s+falecid|falar\s+com\s+(o\s+|a\s+)?(morto|falecid|morta|falecida|espirito|espírito)|psicograf|alma\s+do\s+meu|alma\s+da\s+minha|falar\s+com\s+quem\s+morreu|esp[ií]rito\s+do\s+meu|m[eé]dium|incorporar)\b/i.test(q);
+    if (isNecromancy) {
+      return {
+        source: 'ethical_safeguard',
+        diagnosis: 'O Tarot atua como um espelho de reflexão e discernimento para a consciência dos seres vivos no plano terreno. Não operamos como canal mediúnico, psicografia ou necromancia para estabelecer comunicação direta com espíritos ou entes já falecidos.',
+        dynamics: 'O vínculo com quem partiu permanece vivo na memória afetiva, no respeito ao legado e no amor compartilhado. O simbolismo das cartas convida você a acolher as etapas do luto e cuidar das suas próprias emoções no presente.',
+        advice: 'Direcione sua energia para a sua própria cura e paz de espírito. Honre a memória de quem partiu vivendo com dignidade e amor no aqui e agora.',
+        text: '### 🌌 O Diagnóstico da Intenção\nO Tarot atua como um espelho de reflexão e discernimento para a consciência dos seres vivos no plano terreno. Não operamos como canal mediúnico, psicografia ou necromancia para estabelecer comunicação direta com espíritos ou entes já falecidos.\n\n### 🔮 A Dinâmica das Forças Ocultas\nO vínculo com quem partiu permanece vivo na memória afetiva, no respeito ao legado e no amor compartilhado. O simbolismo das cartas convida você a acolher as etapas do luto e cuidar das suas próprias emoções no presente.\n\n### 🗝️ O Conselho Sagrado do Oráculo\nDirecione sua energia para a sua própria cura e paz de espírito. Honre a memória de quem partiu vivendo com dignidade e amor no aqui e agora.'
+      };
+    }
+
     const isAboutOtherPerson = /\b(ele|ela|ex|namorad|marid|espos|ficante|s[oó]ci|chefe|amig|trai[çc]|gosta|sente|voltar|pensa)\b/i.test(q);
 
     // Identify shadow or warning cards
